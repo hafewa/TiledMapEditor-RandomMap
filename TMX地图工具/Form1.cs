@@ -126,6 +126,12 @@ namespace TMX地图工具 {
         #region 地图整体随机模块
 
         private void 地图整体随机( object sender, EventArgs e ) {
+            int 总模块 = 5;
+            int 模块占比 = 10;
+
+            progressBar1.Minimum = 0;
+            progressBar1.Maximum = 总模块 * 模块占比;
+            progressBar1.Value = 0;
 
             var path = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_New", "tmx");
             if ( path == null ) {
@@ -133,23 +139,34 @@ namespace TMX地图工具 {
                 return;
             }
 
+            //模块1
             if ( !TmxIsLoaded() ) {
                 return ;
             }
+            progressBar1.Value += 模块占比;
 
+            //模块2
             if ( !地图数组初始化() ) {
                 return;
             }
+            progressBar1.Value += 模块占比;
 
+            //模块3
             地型随机();
-            装饰物随机();
+            progressBar1.Value += 模块占比;
 
+            //模块4
+            装饰物随机();
+            progressBar1.Value += 模块占比;
+
+            //模块5
             if ( 地图数据转化成CSV格式() ) {
                 SaveTmx(path);
             }
             else {
                 MessageBox.Show("地图数据转化成CSV格式失败!");
             }
+            progressBar1.Value += 模块占比;
         }
 
         private bool 地图数组初始化() {
@@ -219,14 +236,14 @@ namespace TMX地图工具 {
         }
 
         #region 地型随机
+
+        int 已生成湖泊格子数 = 0;
         void 地型随机() {
             地图重置(地型地图);
 
-            int 湖泊概率 = 10;
             int 沙地概率 = 40;
-            int 草地概率 = 50;
 
-            总湖泊格子数 = 0;
+            已生成湖泊格子数 = 0;
 
             List<Point> 可生成湖泊的点集合 = new List<Point>();
 
@@ -250,63 +267,25 @@ namespace TMX地图工具 {
 
                             地型地图[col, row] = 地型_草地;
                         }
-
-                        if ( 可生成河流(pos)/* && 当前坐标N格范围内没有特定地型(pos, 4, IsLake) */) {
+                        if ( 可生成河流(pos) ) {
                             可生成湖泊的点集合.Add(pos);
                         }
-
                     }
                 }
             }
 
             while ( 可生成湖泊的点集合.Count != 0 && !已生成湖泊到达总占比() ) {
+
                 var pos = 可生成湖泊的点集合.Random();
-                int rand = Range(1, 100);
-                if ( rand < 20 ) {
 
-                    湖的格子数 = Range(1, 10);
-                }
-                else {
-                    //湖的格子数 = (int)this.numericUpDown1.Value;// Range(1, 10);
-                    湖的格子数 = Range(10, 16);
-                }
+                地型格子数 = Range(9, 20);
 
-                湖泊递归随机(pos);
+                if ( 当前坐标N格范围内没有特定地型(pos, 20, IsLake) ) {
+
+                    地型随机延伸(pos, 可生成河流, 设置湖泊);
+                }
 
                 可生成湖泊的点集合.Remove(pos);
-            }
-
-        }
-
-        int 总湖泊格子数 = 0;
-        int 湖的格子数 = 0;
-        void 湖泊递归随机(Point pos) {
-            if ( 湖的格子数 == 0 ) {
-                return;
-            }
-
-            设置湖泊(pos);
-            湖的格子数--;
-
-            List<Point> 可生成水洼列表 = new List<Point>();
-            Point nextPos;
-            foreach ( var item in 相邻八边偏移量 ) {
-
-                nextPos = pos + item;
-                if ( IsInMap(nextPos) ) {
-
-                    可生成水洼列表.Add(nextPos);
-                }
-            }
-
-            while ( 可生成水洼列表.Count != 0 ) {
-                var pos2 = 可生成水洼列表.Random();
-
-                if( 可生成河流(pos2) ) {
-
-                    湖泊递归随机(pos2);
-                }
-                可生成水洼列表.Remove(pos2);
             }
 
         }
@@ -314,14 +293,14 @@ namespace TMX地图工具 {
         void 设置湖泊( Point pos ) {
 
             地型地图[pos.X, pos.Y] = 地型_湖泊;
-            总湖泊格子数++;
+            已生成湖泊格子数++;           
         }
 
         //湖泊占所有的格子的比例
         float 湖泊总占比 = 0.1f;
         bool 已生成湖泊到达总占比() {
 
-            return 总湖泊格子数 > ( TotalPos() * 湖泊总占比 );
+            return 已生成湖泊格子数 > ( TotalPos() * 湖泊总占比 );
         }
 
         bool 可生成河流( Point pos ) {
@@ -339,40 +318,6 @@ namespace TMX地图工具 {
             return true;
         }
 
-        public delegate bool 该位置符合要求(Point pos);
-
-        int 地型格子数 = 0;
-        void 地型随机延伸( Point pos, int[,] 地图, int 地型类型, 该位置符合要求 该位置符合要求 ) {
-            if ( 地型格子数 == 0 ) {
-                return;
-            }
-
-            地图[pos.X, pos.Y] = 地型类型;
-            地型格子数--;
-
-            List<Point> 可生成水洼列表 = new List<Point>();
-            Point nextPos;
-            foreach ( var item in 相邻八边偏移量 ) {
-
-                nextPos = pos + item;
-                if ( IsInMap(nextPos) ) {
-
-                    可生成水洼列表.Add(nextPos);
-                }
-            }
-
-            while ( 可生成水洼列表.Count != 0 ) {
-                var pos2 = 可生成水洼列表.Random();
-
-                if ( 该位置符合要求(pos2) ) {
-
-                    地型随机延伸(pos2, 地图, 地型类型, 该位置符合要求);
-                }
-                可生成水洼列表.Remove(pos2);
-            }
-
-        }
-
         #endregion
 
         #region  装饰物随机
@@ -380,85 +325,87 @@ namespace TMX地图工具 {
         void 装饰物随机() {
             地图重置(Layer2映射地图);
 
-            float 树林概率 = 0.3f;
-            float 山体概率 = 0.3f;
-
-            int 总块数 = 0;
-            List<Point> 遮罩外的点集合 = new List<Point>();
+            float 树林概率 = 0.35f * ( 1 - 湖泊总占比 );
+            float 山体概率 = 0.25f * ( 1 - 湖泊总占比 );
+            
+            List<Point> 遮罩空白区域点集合 = new List<Point>();
 
             for ( int row = 0; row < 地图高度; row++ ) {
                 for ( int col = 0; col < 地图宽度; col++ ) {
 
-                    if ( !IsWhiteMask(col, row) ) {
+                    var pos = new Point(col, row);
 
-                        遮罩外的点集合.Add(new Point(col, row));
+                    if ( IsMountInMask(pos) ) {
 
-                        //if ( 当前坐标N格范围内没有特定地型(col, row, 2, IsLake) ) {
+                        设置layer2层山体(pos);
+                    }
 
-                        //    int rand = Range(1, 100);
-                        //    if ( rand < 树林概率 ) {
 
-                        //        Layer2映射地图[col, row] = 树林;
-                        //    }
-                        //    else if ( rand < 树林概率 + 山体概率 ) {
+                    if ( IsForestInMask(pos) ) {
 
-                        //        Layer2映射地图[col, row] = 山体;
-                        //    }
-                        //}
+                        设置layer2层树林(pos);
+                    }
+
+                    if ( IsBlankInMask(pos) ||
+                        IsBlackInMask(pos) ||
+                        当前坐标N格范围包含特定地型(pos, 2, IsLake) ) {
+
+                        遮罩空白区域点集合.Add(pos);
                     }
                 }
             }
-            总块数 = 遮罩外的点集合.Count;
 
             //progressBar1.Minimum = 0;
             //progressBar1.Maximum = 总块数;
 
             int 已生成树林块数 = 0;
-            while ( 遮罩外的点集合.Count != 0 && 已生成树林块数 < ( 总块数 * 树林概率 ) ) {
+            while ( 遮罩空白区域点集合.Count != 0 && 已生成树林块数 < ( TotalPos() * 树林概率 ) ) {
 
-                var pos = 遮罩外的点集合.Random();
+                var pos = 遮罩空白区域点集合.Random();
 
-                if( 该位置可放树木(pos) ) {
+                if( 该位置可放树林(pos) ) {
 
-                    地型格子数 = Range(10, 20);
+                    地型格子数 = Range(9, 20);
                     已生成树林块数 += 地型格子数;
 
-                    地型随机延伸(pos, Layer2映射地图, 树林, 该位置可放树木);
+                    地型随机延伸(pos, 该位置可放树林, 设置layer2层树林);
 
                     已生成树林块数 -= 地型格子数;
                 }
 
                 //progressBar1.Value++;
 
-                遮罩外的点集合.Remove(pos);
+                遮罩空白区域点集合.Remove(pos);
             }
 
 
             int 已生成山体块数 = 0;
-            while ( 遮罩外的点集合.Count != 0 && 已生成山体块数 < ( 总块数 * 山体概率 ) ) {
+            while ( 遮罩空白区域点集合.Count != 0 && 已生成山体块数 < ( TotalPos() * 山体概率 ) ) {
 
-                var pos = 遮罩外的点集合.Random();
+                var pos = 遮罩空白区域点集合.Random();
 
                 if ( 该位置可放山体(pos) ) {
 
-                    地型格子数 = Range(10, 20);
+                    地型格子数 = Range(9, 20);
                     已生成山体块数 += 地型格子数;
 
-                    地型随机延伸(pos, Layer2映射地图, 山体, 该位置可放山体);
+                    地型随机延伸(pos, 该位置可放山体, 设置layer2层山体);
 
                     已生成山体块数 -= 地型格子数;
                 }
 
                 //progressBar1.Value++;
 
-                遮罩外的点集合.Remove(pos);
+                遮罩空白区域点集合.Remove(pos);
             }
 
             //progressBar1.Value = progressBar1.Maximum;
         }
 
-        bool 该位置可放树木(Point pos) {
-            if ( IsMask(pos) ||
+        bool 该位置可放树林( Point pos ) {
+            if ( ( !IsBlankInMask(pos) && !IsBlackInMask(pos) ) ||
+                IsForest(pos) ||
+                IsMount(pos) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsLake)
                 ) {
                 return false;
@@ -467,13 +414,24 @@ namespace TMX地图工具 {
         }
 
         bool 该位置可放山体( Point pos ) {
-            if ( IsMask(pos) ||
+            if ( ( !IsBlankInMask(pos) && !IsBlackInMask(pos) ) ||
                 IsForest(pos) ||
+                IsMount(pos) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsLake)
                 ) {
                 return false;
             }
             return true;
+        }
+
+        void 设置layer2层树林( Point pos ) {
+
+            Layer2映射地图[pos.X, pos.Y] = 树林;
+        }
+
+        void 设置layer2层山体( Point pos ) {
+
+            Layer2映射地图[pos.X, pos.Y] = 山体;
         }
 
         #endregion
@@ -1141,10 +1099,17 @@ namespace TMX地图工具 {
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
+        bool IsBlankInMask( int x, int y ) {
+            return 遮罩[x, y] == 0;
+        }
+        bool IsBlankInMask( Point pos ) {
+            return IsBlankInMask(pos.X, pos.Y);
+        }
+
         bool IsWhiteMask( int x, int y ) {
             return 遮罩[x, y] == white + 随机起始索引;
         }
-        bool IsMask( Point pos ) {
+        bool IsWhiteMask( Point pos ) {
             return IsWhiteMask(pos.X, pos.Y);
         }
 
@@ -1196,6 +1161,14 @@ namespace TMX地图工具 {
             return Layer2映射地图[x, y] == 树林;
         }
 
+        bool IsMount( Point pos ) {
+            return IsMount(pos.X, pos.Y);
+        }
+
+        bool IsMount( int x, int y ) {
+            return Layer2映射地图[x, y] == 山体;
+        }
+
         public delegate bool 该位置匹配的地型特征( int x, int y );
         public bool 当前坐标N格范围包含特定地型( int x, int y, int n, 该位置匹配的地型特征 该位置有某地型 ) {
             for ( int row = y - n; row <= y + n; row++ ) {
@@ -1229,6 +1202,42 @@ namespace TMX地图工具 {
 
         int TotalPos() {
             return 地图宽度 * 地图高度;
+        }
+
+        public delegate void 设置地型( Point pos );
+        public delegate bool 该位置符合要求( Point pos );
+
+        int 地型格子数 = 0;
+        void 地型随机延伸( Point pos, 该位置符合要求 该位置符合要求, 设置地型 设置地型 ) {
+            if ( 地型格子数 == 0 ) {
+                return;
+            }
+
+            设置地型(pos);
+
+            地型格子数--;
+
+            List<Point> 可生成地型列表 = new List<Point>();
+            Point nextPos;
+            foreach ( var item in 相邻八边偏移量 ) {
+
+                nextPos = pos + item;
+                if ( IsInMap(nextPos) ) {
+
+                    可生成地型列表.Add(nextPos);
+                }
+            }
+
+            while ( 可生成地型列表.Count != 0 ) {
+                var pos2 = 可生成地型列表.Random();
+
+                if ( 该位置符合要求(pos2) ) {
+
+                    地型随机延伸(pos2, 该位置符合要求, 设置地型);
+                }
+                可生成地型列表.Remove(pos2);
+            }
+
         }
 
         #endregion
