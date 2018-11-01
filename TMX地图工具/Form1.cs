@@ -32,7 +32,9 @@ namespace TMX地图工具 {
 
         public int 树林 = 6;
         public int 山体 = 3;
-        public int 池汤 = 9;
+
+        public int 湖泊装饰 = 12;
+        public int 陆地装饰 = 14;
 
         int black = 0;
         int white = 1;
@@ -237,15 +239,18 @@ namespace TMX地图工具 {
 
         #region 地型随机
 
-        int 已生成湖泊格子数 = 0;
+        float 湖泊概率 = 0.1f;
+        float 草地概率 = 0.4f;
+
+        int 已生成湖泊格子数;
+        int 已生成草地格子数;
         void 地型随机() {
             地图重置(地型地图);
-
-            int 沙地概率 = 40;
-
+            
             已生成湖泊格子数 = 0;
 
-            List<Point> 可生成湖泊的点集合 = new List<Point>();
+            List<Point> 待生成湖泊集合 = new List<Point>();
+            List<Point> 待生成草地集合 = new List<Point>();
 
             for ( int row = 0; row < 地图高度; row++ ) {
                 for ( int col = 0; col < 地图宽度; col++ ) {
@@ -259,24 +264,33 @@ namespace TMX地图工具 {
                     }
                     else {
 
-                        if ( Range(1, 100) < 沙地概率 ) {
 
-                            地型地图[col, row] = 地型_泥地;
-                        }
-                        else {
+                        地型地图[col, row] = 地型_泥地;
 
-                            地型地图[col, row] = 地型_草地;
+                        //if ( Range(1, 100) < 沙地概率 ) {
+                        //}
+                        //else {
+
+                        //    地型地图[col, row] = 地型_草地;
+                        //}
+
+                        if ( 当前坐标N格范围内没有特定地型(pos, 2, IsLake) ) {
+
+                            待生成草地集合.Add(pos);
                         }
+
                         if ( 可生成河流(pos) ) {
-                            可生成湖泊的点集合.Add(pos);
+
+                            待生成湖泊集合.Add(pos);
                         }
                     }
                 }
             }
 
-            while ( 可生成湖泊的点集合.Count != 0 && !已生成湖泊到达总占比() ) {
+            //湖泊
+            while ( 待生成湖泊集合.Count != 0 && !已生成湖泊到达总占比() ) {
 
-                var pos = 可生成湖泊的点集合.Random();
+                var pos = 待生成湖泊集合.Random();
 
                 地型格子数 = Range(9, 20);
 
@@ -285,9 +299,49 @@ namespace TMX地图工具 {
                     地型随机延伸(pos, 可生成河流, 设置湖泊);
                 }
 
-                可生成湖泊的点集合.Remove(pos);
+                待生成湖泊集合.Remove(pos);
             }
 
+            //草地
+            已生成草地格子数 = 0;
+
+            while ( 待生成草地集合.Count != 0 && !已生成草地到达总占比() ) {
+
+                var pos = 待生成草地集合.Random();
+
+                地型格子数 = Range(5, 200);
+
+                if ( 可生成草地(pos) ) {
+
+                    地型随机延伸(pos, 可生成草地, 设置草地);
+                }
+
+                待生成草地集合.Remove(pos);
+            }
+
+        }
+
+        void 设置草地( Point pos ) {
+
+            地型地图[pos.X, pos.Y] = 地型_草地;
+            已生成草地格子数++;
+        }
+
+        bool 已生成草地到达总占比() {
+
+            return 已生成草地格子数 > ( TotalPos() * 草地概率 );
+        }
+
+        bool 可生成草地( Point pos ) {
+            if ( IsGrass(pos) ||
+                已生成草地到达总占比() ||
+                当前坐标N格范围包含特定地型(pos, 2, IsLake)
+                ) {
+
+                return false;
+            }
+
+            return true;
         }
 
         void 设置湖泊( Point pos ) {
@@ -296,8 +350,6 @@ namespace TMX地图工具 {
             已生成湖泊格子数++;           
         }
 
-        //湖泊占所有的格子的比例
-        float 湖泊概率 = 0.1f;
         bool 已生成湖泊到达总占比() {
 
             return 已生成湖泊格子数 > ( TotalPos() * 湖泊概率 );
@@ -324,20 +376,30 @@ namespace TMX地图工具 {
 
         float 山体概率 = 0.20f * ( 0.9f );
         float 树林概率 = 0.35f * ( 0.9f );
+
+        float 湖泊装饰物概率 = 0.05f;
+        float 陆地装饰物概率 = 0.05f;
+
         int 已生成的山体格子;
         int 已生成的树林格子;
+        int 已生成的湖泊装饰格子;
+        int 已生成的陆地装饰格子;
         void 装饰物随机() {
             地图重置(Layer2映射地图);
 
             已生成的山体格子 = 0;
             已生成的树林格子 = 0;
+            已生成的湖泊装饰格子 = 0;
+            已生成的陆地装饰格子 = 0;
 
+            List<Point> 全图点集合 = new List<Point>();
             List<Point> 遮罩空白区域点集合 = new List<Point>();
 
             for ( int row = 0; row < 地图高度; row++ ) {
                 for ( int col = 0; col < 地图宽度; col++ ) {
 
                     var pos = new Point(col, row);
+                    全图点集合.Add(pos);
 
                     if ( IsMountInMask(pos) ) {
 
@@ -351,8 +413,8 @@ namespace TMX地图工具 {
                     }
 
                     if ( IsBlankInMask(pos) ||
-                        IsBlackInMask(pos) ||
-                        当前坐标N格范围包含特定地型(pos, 2, IsLake) ) {
+                        IsBlackInMask(pos)
+                        ) {
 
                         遮罩空白区域点集合.Add(pos);
                     }
@@ -387,6 +449,62 @@ namespace TMX地图工具 {
                 遮罩空白区域点集合.Remove(pos);
             }
 
+            while ( 全图点集合.Count != 0 && (!湖泊装饰物达到总占比() || !陆地装饰物达到总占比()) ) {
+                var pos = 全图点集合.Random();
+
+                if ( 该位置可放湖泊装饰物(pos) ) {
+                    设置湖泊装饰物(pos);
+                }
+
+                if( 该位置可放陆地装饰物(pos) )
+                {
+                    设置陆地装饰物(pos);
+                }
+
+                全图点集合.Remove(pos);
+            }
+        }
+
+        void 设置湖泊装饰物( Point pos ) {
+
+            Layer2映射地图[pos.X, pos.Y] = 湖泊装饰;
+            已生成的湖泊装饰格子++;
+        }
+
+        void 设置陆地装饰物( Point pos ) {
+
+            Layer2映射地图[pos.X, pos.Y] = 陆地装饰;
+            已生成的陆地装饰格子++;
+        }
+
+        bool 该位置可放湖泊装饰物( Point pos ) {
+            if ( HasNotArticle(pos) &&
+                !湖泊装饰物达到总占比() &&
+                IsLake(pos)
+                ) {
+                return true;
+            }
+            return false;
+        }
+
+        bool 该位置可放陆地装饰物( Point pos ) {
+            if ( HasNotArticle(pos) &&
+                !陆地装饰物达到总占比() &&
+                当前坐标N格范围内没有特定地型(pos, 1, IsLake)
+                ) {
+                return true;
+            }
+            return false;
+        }
+
+        bool 湖泊装饰物达到总占比() {
+
+            return 已生成的湖泊装饰格子 > ( TotalPos() * 湖泊装饰物概率 );
+        }
+
+        bool 陆地装饰物达到总占比() {
+
+            return 已生成的陆地装饰格子 > ( TotalPos() * 陆地装饰物概率 );
         }
 
         bool 树林达到总占比() {
@@ -399,7 +517,7 @@ namespace TMX地图工具 {
                 树林达到总占比() ||
                 IsForest(pos) ||
                 IsMount(pos) ||
-                当前坐标N格范围包含特定地型(pos, 2, IsLake)
+                当前坐标N格范围包含特定地型(pos, 1, IsLake)
                 ) {
                 return false;
             }
@@ -416,7 +534,7 @@ namespace TMX地图工具 {
                 山体达到总占比() ||
                 IsForest(pos) ||
                 IsMount(pos) ||
-                当前坐标N格范围包含特定地型(pos, 2, IsLake)
+                当前坐标N格范围包含特定地型(pos, 1, IsLake)
                 ) {
                 return false;
             }
@@ -1146,12 +1264,20 @@ namespace TMX地图工具 {
             return IsBlackInMask(pos.X, pos.Y);
         }
 
-        bool IsLake(Point pos) {
+        bool IsLake( Point pos ) {
             return IsLake(pos.X, pos.Y);
         }
 
         bool IsLake( int x, int y ) {
             return 地型地图[x, y] == 地型_湖泊;
+        }
+
+        bool IsGrass( Point pos ) {
+            return IsGrass(pos.X, pos.Y);
+        }
+
+        bool IsGrass( int x, int y ) {
+            return 地型地图[x, y] == 地型_草地;
         }
 
         bool IsForest( Point pos ) {
@@ -1168,6 +1294,14 @@ namespace TMX地图工具 {
 
         bool IsMount( int x, int y ) {
             return Layer2映射地图[x, y] == 山体;
+        }
+
+        bool HasNotArticle( Point pos ) {
+            return HasNotArticle(pos.X, pos.Y);
+        }
+
+        bool HasNotArticle( int x, int y ) {
+            return Layer2映射地图[x, y] == 0;
         }
 
         public delegate bool 该位置匹配的地型特征( int x, int y );
@@ -1779,31 +1913,49 @@ namespace TMX地图工具 {
             MessageBox.Show("导出完成!");
         }
         #endregion
-               
-        private void trackBar1_Scroll( object sender, EventArgs e ) {
-            label2.Text = "湖泊:" + trackBar1.Value.ToString() + "%";
-            湖泊概率 = trackBar1.Value / 100.0f;
+        
+        private void Form1_Load( object sender, EventArgs e ) {
+            湖泊label2.Text = "湖泊:" + 湖泊trackBar1.Value.ToString() + "%";
+            湖泊概率 = 湖泊trackBar1.Value / 100.0f;
+
+            山体label3.Text = "山体:" + 山体trackBar2.Value.ToString() + "%";
+            山体概率 = 山体trackBar2.Value / 100.0f;
+
+            树林label4.Text = "树林:" + 树林trackBar3.Value.ToString() + "%";
+            树林概率 = 树林trackBar3.Value / 100.0f;
+
+            湖泊装饰label5.Text = "湖泊装饰:" + 湖泊装饰trackBar4.Value.ToString() + "%";
+            湖泊装饰物概率 = 湖泊装饰trackBar4.Value / 100.0f;
+
+            陆地装饰label2.Text = "陆地装饰:" + 陆地trackBar1.Value.ToString() + "%";
+            陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
         }
 
-        private void Form1_Load( object sender, EventArgs e ) {
-            label2.Text = "湖泊:" + trackBar1.Value.ToString() + "%";
-            湖泊概率 = trackBar1.Value / 100.0f;
-
-            label3.Text = "山体:" + trackBar2.Value.ToString() + "%";
-            山体概率 = trackBar2.Value / 100.0f;
-
-            label4.Text = "树林:" + trackBar3.Value.ToString() + "%";
-            树林概率 = trackBar3.Value / 100.0f;
+        private void trackBar1_Scroll( object sender, EventArgs e ) {
+            湖泊label2.Text = "湖泊:" + 湖泊trackBar1.Value.ToString() + "%";
+            湖泊概率 = 湖泊trackBar1.Value / 100.0f;
         }
 
         private void trackBar2_Scroll( object sender, EventArgs e ) {
-            label3.Text = "山体:" + trackBar2.Value.ToString() + "%";
-            山体概率 = trackBar2.Value / 100.0f;
+            山体label3.Text = "山体:" + 山体trackBar2.Value.ToString() + "%";
+            山体概率 = 山体trackBar2.Value / 100.0f;
         }
 
         private void trackBar3_Scroll( object sender, EventArgs e ) {
-            label4.Text = "树林:" + trackBar3.Value.ToString() + "%";
-            树林概率 = trackBar3.Value / 100.0f;
+            树林label4.Text = "树林:" + 树林trackBar3.Value.ToString() + "%";
+            树林概率 = 树林trackBar3.Value / 100.0f;
+        }
+
+        private void trackBar4_Scroll( object sender, EventArgs e ) {
+
+            湖泊装饰label5.Text = "湖泊装饰:" + 湖泊装饰trackBar4.Value.ToString() + "%";
+            湖泊装饰物概率 = 湖泊装饰trackBar4.Value / 100.0f;
+        }
+
+        private void 陆地trackBar1_Scroll( object sender, EventArgs e ) {
+
+            陆地装饰label2.Text = "陆地装饰:" + 陆地trackBar1.Value.ToString() + "%";
+            陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
         }
     }
 }

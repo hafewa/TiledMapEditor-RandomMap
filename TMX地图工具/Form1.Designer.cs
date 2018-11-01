@@ -32,15 +32,21 @@
             this.btn_segment = new System.Windows.Forms.Button();
             this.btn_export_area = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.trackBar2 = new System.Windows.Forms.TrackBar();
-            this.label4 = new System.Windows.Forms.Label();
-            this.trackBar3 = new System.Windows.Forms.TrackBar();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).BeginInit();
+            this.湖泊trackBar1 = new System.Windows.Forms.TrackBar();
+            this.湖泊label2 = new System.Windows.Forms.Label();
+            this.山体label3 = new System.Windows.Forms.Label();
+            this.山体trackBar2 = new System.Windows.Forms.TrackBar();
+            this.树林label4 = new System.Windows.Forms.Label();
+            this.树林trackBar3 = new System.Windows.Forms.TrackBar();
+            this.湖泊装饰label5 = new System.Windows.Forms.Label();
+            this.湖泊装饰trackBar4 = new System.Windows.Forms.TrackBar();
+            this.陆地装饰label2 = new System.Windows.Forms.Label();
+            this.陆地trackBar1 = new System.Windows.Forms.TrackBar();
+            ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.湖泊装饰trackBar4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.陆地trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -121,7 +127,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(113, 140);
+            this.button1.Location = new System.Drawing.Point(56, 87);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(109, 33);
             this.button1.TabIndex = 8;
@@ -129,74 +135,116 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.地图整体随机);
             // 
-            // trackBar1
+            // 湖泊trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(56, 179);
-            this.trackBar1.Maximum = 100;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(194, 45);
-            this.trackBar1.TabIndex = 9;
-            this.trackBar1.Value = 15;
-            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            this.湖泊trackBar1.Location = new System.Drawing.Point(32, 140);
+            this.湖泊trackBar1.Maximum = 100;
+            this.湖泊trackBar1.Name = "湖泊trackBar1";
+            this.湖泊trackBar1.Size = new System.Drawing.Size(194, 45);
+            this.湖泊trackBar1.TabIndex = 9;
+            this.湖泊trackBar1.Value = 15;
+            this.湖泊trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
-            // label2
+            // 湖泊label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(256, 179);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 12);
-            this.label2.TabIndex = 10;
-            this.label2.Text = "湖泊10%";
+            this.湖泊label2.AutoSize = true;
+            this.湖泊label2.Location = new System.Drawing.Point(232, 140);
+            this.湖泊label2.Name = "湖泊label2";
+            this.湖泊label2.Size = new System.Drawing.Size(47, 12);
+            this.湖泊label2.TabIndex = 10;
+            this.湖泊label2.Text = "湖泊10%";
             // 
-            // label3
+            // 山体label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(256, 230);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 12);
-            this.label3.TabIndex = 12;
-            this.label3.Text = "山体25%";
+            this.山体label3.AutoSize = true;
+            this.山体label3.Location = new System.Drawing.Point(232, 191);
+            this.山体label3.Name = "山体label3";
+            this.山体label3.Size = new System.Drawing.Size(47, 12);
+            this.山体label3.TabIndex = 12;
+            this.山体label3.Text = "山体25%";
             // 
-            // trackBar2
+            // 山体trackBar2
             // 
-            this.trackBar2.Location = new System.Drawing.Point(56, 230);
-            this.trackBar2.Maximum = 100;
-            this.trackBar2.Name = "trackBar2";
-            this.trackBar2.Size = new System.Drawing.Size(194, 45);
-            this.trackBar2.TabIndex = 11;
-            this.trackBar2.Value = 15;
-            this.trackBar2.Scroll += new System.EventHandler(this.trackBar2_Scroll);
+            this.山体trackBar2.Location = new System.Drawing.Point(32, 191);
+            this.山体trackBar2.Maximum = 100;
+            this.山体trackBar2.Name = "山体trackBar2";
+            this.山体trackBar2.Size = new System.Drawing.Size(194, 45);
+            this.山体trackBar2.TabIndex = 11;
+            this.山体trackBar2.Value = 15;
+            this.山体trackBar2.Scroll += new System.EventHandler(this.trackBar2_Scroll);
             // 
-            // label4
+            // 树林label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(256, 281);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(47, 12);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "树林35%";
+            this.树林label4.AutoSize = true;
+            this.树林label4.Location = new System.Drawing.Point(232, 242);
+            this.树林label4.Name = "树林label4";
+            this.树林label4.Size = new System.Drawing.Size(47, 12);
+            this.树林label4.TabIndex = 14;
+            this.树林label4.Text = "树林35%";
             // 
-            // trackBar3
+            // 树林trackBar3
             // 
-            this.trackBar3.Location = new System.Drawing.Point(56, 281);
-            this.trackBar3.Maximum = 100;
-            this.trackBar3.Name = "trackBar3";
-            this.trackBar3.Size = new System.Drawing.Size(194, 45);
-            this.trackBar3.TabIndex = 13;
-            this.trackBar3.Value = 25;
-            this.trackBar3.Scroll += new System.EventHandler(this.trackBar3_Scroll);
+            this.树林trackBar3.Location = new System.Drawing.Point(32, 242);
+            this.树林trackBar3.Maximum = 100;
+            this.树林trackBar3.Name = "树林trackBar3";
+            this.树林trackBar3.Size = new System.Drawing.Size(194, 45);
+            this.树林trackBar3.TabIndex = 13;
+            this.树林trackBar3.Value = 25;
+            this.树林trackBar3.Scroll += new System.EventHandler(this.trackBar3_Scroll);
+            // 
+            // 湖泊装饰label5
+            // 
+            this.湖泊装饰label5.AutoSize = true;
+            this.湖泊装饰label5.Location = new System.Drawing.Point(232, 293);
+            this.湖泊装饰label5.Name = "湖泊装饰label5";
+            this.湖泊装饰label5.Size = new System.Drawing.Size(65, 12);
+            this.湖泊装饰label5.TabIndex = 16;
+            this.湖泊装饰label5.Text = "湖泊装饰5%";
+            // 
+            // 湖泊装饰trackBar4
+            // 
+            this.湖泊装饰trackBar4.Location = new System.Drawing.Point(32, 293);
+            this.湖泊装饰trackBar4.Maximum = 30;
+            this.湖泊装饰trackBar4.Name = "湖泊装饰trackBar4";
+            this.湖泊装饰trackBar4.Size = new System.Drawing.Size(194, 45);
+            this.湖泊装饰trackBar4.TabIndex = 15;
+            this.湖泊装饰trackBar4.Value = 1;
+            this.湖泊装饰trackBar4.Scroll += new System.EventHandler(this.trackBar4_Scroll);
+            // 
+            // 陆地装饰label2
+            // 
+            this.陆地装饰label2.AutoSize = true;
+            this.陆地装饰label2.Location = new System.Drawing.Point(232, 344);
+            this.陆地装饰label2.Name = "陆地装饰label2";
+            this.陆地装饰label2.Size = new System.Drawing.Size(65, 12);
+            this.陆地装饰label2.TabIndex = 18;
+            this.陆地装饰label2.Text = "陆地装饰5%";
+            // 
+            // 陆地trackBar1
+            // 
+            this.陆地trackBar1.Location = new System.Drawing.Point(32, 344);
+            this.陆地trackBar1.Maximum = 30;
+            this.陆地trackBar1.Name = "陆地trackBar1";
+            this.陆地trackBar1.Size = new System.Drawing.Size(194, 45);
+            this.陆地trackBar1.TabIndex = 17;
+            this.陆地trackBar1.Value = 5;
+            this.陆地trackBar1.Scroll += new System.EventHandler(this.陆地trackBar1_Scroll);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.trackBar3);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.trackBar2);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.陆地装饰label2);
+            this.Controls.Add(this.陆地trackBar1);
+            this.Controls.Add(this.湖泊装饰label5);
+            this.Controls.Add(this.湖泊装饰trackBar4);
+            this.Controls.Add(this.树林label4);
+            this.Controls.Add(this.树林trackBar3);
+            this.Controls.Add(this.山体label3);
+            this.Controls.Add(this.山体trackBar2);
+            this.Controls.Add(this.湖泊label2);
+            this.Controls.Add(this.湖泊trackBar1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_export_area);
             this.Controls.Add(this.btn_segment);
@@ -209,9 +257,11 @@
             this.Name = "Form1";
             this.Text = "地图工具";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.湖泊装饰trackBar4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.陆地trackBar1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -228,12 +278,16 @@
         private System.Windows.Forms.Button btn_segment;
         private System.Windows.Forms.Button btn_export_area;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TrackBar trackBar1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TrackBar trackBar2;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TrackBar trackBar3;
+        private System.Windows.Forms.TrackBar 湖泊trackBar1;
+        private System.Windows.Forms.Label 湖泊label2;
+        private System.Windows.Forms.Label 山体label3;
+        private System.Windows.Forms.TrackBar 山体trackBar2;
+        private System.Windows.Forms.Label 树林label4;
+        private System.Windows.Forms.TrackBar 树林trackBar3;
+        private System.Windows.Forms.Label 湖泊装饰label5;
+        private System.Windows.Forms.TrackBar 湖泊装饰trackBar4;
+        private System.Windows.Forms.Label 陆地装饰label2;
+        private System.Windows.Forms.TrackBar 陆地trackBar1;
     }
 }
 
