@@ -297,10 +297,10 @@ namespace TMX地图工具 {
         }
 
         //湖泊占所有的格子的比例
-        float 湖泊总占比 = 0.1f;
+        float 湖泊概率 = 0.1f;
         bool 已生成湖泊到达总占比() {
 
-            return 已生成湖泊格子数 > ( TotalPos() * 湖泊总占比 );
+            return 已生成湖泊格子数 > ( TotalPos() * 湖泊概率 );
         }
 
         bool 可生成河流( Point pos ) {
@@ -322,12 +322,16 @@ namespace TMX地图工具 {
 
         #region  装饰物随机
 
+        float 山体概率 = 0.20f * ( 0.9f );
+        float 树林概率 = 0.35f * ( 0.9f );
+        int 已生成的山体格子;
+        int 已生成的树林格子;
         void 装饰物随机() {
             地图重置(Layer2映射地图);
 
-            float 树林概率 = 0.35f * ( 1 - 湖泊总占比 );
-            float 山体概率 = 0.25f * ( 1 - 湖泊总占比 );
-            
+            已生成的山体格子 = 0;
+            已生成的树林格子 = 0;
+
             List<Point> 遮罩空白区域点集合 = new List<Point>();
 
             for ( int row = 0; row < 地图高度; row++ ) {
@@ -355,55 +359,44 @@ namespace TMX地图工具 {
                 }
             }
 
-            //progressBar1.Minimum = 0;
-            //progressBar1.Maximum = 总块数;
-
-            int 已生成树林块数 = 0;
-            while ( 遮罩空白区域点集合.Count != 0 && 已生成树林块数 < ( TotalPos() * 树林概率 ) ) {
-
-                var pos = 遮罩空白区域点集合.Random();
-
-                if( 该位置可放树林(pos) ) {
-
-                    地型格子数 = Range(9, 20);
-                    已生成树林块数 += 地型格子数;
-
-                    地型随机延伸(pos, 该位置可放树林, 设置layer2层树林);
-
-                    已生成树林块数 -= 地型格子数;
-                }
-
-                //progressBar1.Value++;
-
-                遮罩空白区域点集合.Remove(pos);
-            }
-
-
-            int 已生成山体块数 = 0;
-            while ( 遮罩空白区域点集合.Count != 0 && 已生成山体块数 < ( TotalPos() * 山体概率 ) ) {
+            while ( 遮罩空白区域点集合.Count != 0 && !山体达到总占比() ) {
 
                 var pos = 遮罩空白区域点集合.Random();
 
                 if ( 该位置可放山体(pos) ) {
 
                     地型格子数 = Range(9, 20);
-                    已生成山体块数 += 地型格子数;
 
                     地型随机延伸(pos, 该位置可放山体, 设置layer2层山体);
-
-                    已生成山体块数 -= 地型格子数;
                 }
-
-                //progressBar1.Value++;
 
                 遮罩空白区域点集合.Remove(pos);
             }
 
-            //progressBar1.Value = progressBar1.Maximum;
+            while ( 遮罩空白区域点集合.Count != 0 && !树林达到总占比() ) {
+
+                var pos = 遮罩空白区域点集合.Random();
+
+                if( 该位置可放树林(pos) ) {
+
+                    地型格子数 = Range(9, 20);
+
+                    地型随机延伸(pos, 该位置可放树林, 设置layer2层树林);
+                }
+
+                遮罩空白区域点集合.Remove(pos);
+            }
+
+        }
+
+        bool 树林达到总占比() {
+
+            return 已生成的树林格子 > ( TotalPos() * 树林概率 );
         }
 
         bool 该位置可放树林( Point pos ) {
             if ( ( !IsBlankInMask(pos) && !IsBlackInMask(pos) ) ||
+                树林达到总占比() ||
                 IsForest(pos) ||
                 IsMount(pos) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsLake)
@@ -413,8 +406,14 @@ namespace TMX地图工具 {
             return true;
         }
 
+        bool 山体达到总占比() {
+
+            return 已生成的山体格子 > ( TotalPos() * 山体概率 );
+        }
+
         bool 该位置可放山体( Point pos ) {
             if ( ( !IsBlankInMask(pos) && !IsBlackInMask(pos) ) ||
+                山体达到总占比() ||
                 IsForest(pos) ||
                 IsMount(pos) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsLake)
@@ -427,12 +426,14 @@ namespace TMX地图工具 {
         void 设置layer2层树林( Point pos ) {
 
             Layer2映射地图[pos.X, pos.Y] = 树林;
+            已生成的树林格子++;
         }
 
         void 设置layer2层山体( Point pos ) {
 
             Layer2映射地图[pos.X, pos.Y] = 山体;
-        }
+            已生成的山体格子++;
+        } 
 
         #endregion
 
@@ -1781,12 +1782,28 @@ namespace TMX地图工具 {
                
         private void trackBar1_Scroll( object sender, EventArgs e ) {
             label2.Text = "湖泊:" + trackBar1.Value.ToString() + "%";
-            湖泊总占比 = trackBar1.Value / 100.0f;
+            湖泊概率 = trackBar1.Value / 100.0f;
         }
 
         private void Form1_Load( object sender, EventArgs e ) {
             label2.Text = "湖泊:" + trackBar1.Value.ToString() + "%";
-            湖泊总占比 = trackBar1.Value / 100.0f;
+            湖泊概率 = trackBar1.Value / 100.0f;
+
+            label3.Text = "山体:" + trackBar2.Value.ToString() + "%";
+            山体概率 = trackBar2.Value / 100.0f;
+
+            label4.Text = "树林:" + trackBar3.Value.ToString() + "%";
+            树林概率 = trackBar3.Value / 100.0f;
+        }
+
+        private void trackBar2_Scroll( object sender, EventArgs e ) {
+            label3.Text = "山体:" + trackBar2.Value.ToString() + "%";
+            山体概率 = trackBar2.Value / 100.0f;
+        }
+
+        private void trackBar3_Scroll( object sender, EventArgs e ) {
+            label4.Text = "树林:" + trackBar3.Value.ToString() + "%";
+            树林概率 = trackBar3.Value / 100.0f;
         }
     }
 }
