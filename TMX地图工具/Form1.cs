@@ -490,6 +490,7 @@ namespace TMX地图工具 {
         bool 该位置可放陆地装饰物( Point pos ) {
             if ( HasNotArticle(pos) &&
                 !陆地装饰物达到总占比() &&
+                !IsWhiteMask(pos) &&
                 当前坐标N格范围内没有特定地型(pos, 1, IsLake)
                 ) {
                 return true;
