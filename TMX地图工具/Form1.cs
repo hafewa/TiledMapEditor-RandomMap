@@ -1502,6 +1502,7 @@ namespace TMX地图工具 {
 
                 foreach ( var 郡区域点 in 郡区域点列表 ) {
 
+                    //城市本身已经添加跳过
                     if ( 郡区域内城市点列表.Contains(郡区域点) ) {
                         continue;
                     }
@@ -1544,7 +1545,7 @@ namespace TMX地图工具 {
 
             sw.Reset(); sw.Start();
             //修复bug,重设被分离的区域
-            //RepairCityArea(ref city_areaList, ref point_city);
+            RepairCityArea(ref city_areaList, ref point_city);
 
             sw.Stop();
             Log(string.Format("寻找修复分离的区域...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
