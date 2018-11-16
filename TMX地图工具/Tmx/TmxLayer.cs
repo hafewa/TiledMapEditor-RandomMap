@@ -12,6 +12,8 @@ namespace TiledSharp
     public class TmxLayer : ITmxElement {
         public XElement xData;
 
+        public string encoding { get; private set; }
+
         public string Name {get; private set;}
 
         // TODO: Legacy (Tiled Java) attributes (x, y, width, height)
@@ -32,7 +34,7 @@ namespace TiledSharp
             OffsetY = (double?) xLayer.Attribute("offsety") ?? 0.0;
 
             xData = xLayer.Element("data");
-            var encoding = (string)xData.Attribute("encoding");
+            encoding = (string)xData.Attribute("encoding");
 
             Tiles = new Collection<TmxLayerTile>();
             if (encoding == "base64")

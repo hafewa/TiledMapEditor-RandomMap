@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Windows.Forms;
 using TiledSharp;
@@ -831,38 +832,77 @@ namespace TMX地图工具 {
         }
 
         bool SaveDataForEachLayer( List<int[,]> 待转化数组列表, List<string> 图层名字列表 ) {
-            List<string> csv数组列表 = new List<string>();
-            List<string[]> 每行数据列表 = new List<string[]>();
 
-            for ( int i = 0; i < 图层名字列表.Count; i++ ) {
-                csv数组列表.Add(Environment.NewLine);
-                每行数据列表.Add(new string[地图宽度]);
-            }
+            var encoding = 世界地图_TMX.Layers[0].encoding;
+            if ( encoding == "csv" ) {
 
-            for ( int column, row = 0; row < 地图高度; row++ ) {
-                for ( column = 0; column < 地图宽度; column++ ) {
+                List<string> csv数组列表 = new List<string>();
+                List<string[]> 每行数据列表 = new List<string[]>();
+
+                for ( int i = 0; i < 图层名字列表.Count; i++ ) {
+                    csv数组列表.Add(Environment.NewLine);
+                    每行数据列表.Add(new string[地图宽度]);
+                }
+
+                for ( int column, row = 0; row < 地图高度; row++ ) {
+                    for ( column = 0; column < 地图宽度; column++ ) {
+                        for ( int i = 0; i < 待转化数组列表.Count; i++ ) {
+                            每行数据列表[i][column] = 待转化数组列表[i][column, row].ToString();
+                        }
+                    }
+
                     for ( int i = 0; i < 待转化数组列表.Count; i++ ) {
-                        每行数据列表[i][column] = 待转化数组列表[i][column, row].ToString();
+                        csv数组列表[i] += string.Join(",", 每行数据列表[i]);
+                        if ( row != 地图宽度 - 1 ) csv数组列表[i] += ",";
+                        csv数组列表[i] += Environment.NewLine; ;
+                    }
+                }
+
+                for ( int i = 0; i < 图层名字列表.Count; i++ ) {
+                    string layerName = 图层名字列表[i];
+                    if ( !世界地图_TMX.Layers.Contains(layerName) ) {
+                        MessageBox.Show(string.Format("模板不包含层<{0}>,请重新选择地图模板!", layerName));
+                        return false;
+                    }
+                    else {
+                        世界地图_TMX.Layers[layerName].xData.Value = csv数组列表[i];
+                    }
+                }
+
+            }
+            else if ( encoding == "base64" ) {
+
+
+                List<MemoryStream> 每层地图数据读取流 = new List<MemoryStream>();
+                for ( int i = 0; i < 待转化数组列表.Count; i++ ) {
+                    每层地图数据读取流.Add(new MemoryStream());
+                }
+
+                for ( int column, row = 0; row < 地图高度; row++ ) {
+                    for ( column = 0; column < 地图宽度; column++ ) {
+
+                        for ( int i = 0; i < 待转化数组列表.Count; i++ ) {
+
+                            var arr = BitConverter.GetBytes(待转化数组列表[i][column, row]);
+                            每层地图数据读取流[i].Write(arr, 0, arr.Length);
+                        }
                     }
                 }
 
                 for ( int i = 0; i < 待转化数组列表.Count; i++ ) {
-                    csv数组列表[i] += string.Join(",", 每行数据列表[i]);
-                    if ( row != 地图宽度 - 1 ) csv数组列表[i] += ",";
-                    csv数组列表[i] += Environment.NewLine; ;
-                }
-            }
 
-            for ( int i = 0; i < 图层名字列表.Count; i++ ) {
-                string layerName = 图层名字列表[i];
-                if ( !世界地图_TMX.Layers.Contains(layerName) ) {
-                    MessageBox.Show(string.Format("模板不包含层<{0}>,请重新选择地图模板!", layerName));
-                    return false;
-                }
-                else {
-                    世界地图_TMX.Layers[layerName].xData.Value = csv数组列表[i];
+                    byte[] buffer = 每层地图数据读取流[i].ToArray();
+                    MemoryStream responseStream = new MemoryStream();
+                    using ( GZipStream compressedStream = new GZipStream(responseStream, CompressionMode.Compress, true) ) {
+                        compressedStream.Write(buffer, 0, buffer.Length);
+                    }
+
+                    string text64 = Convert.ToBase64String(responseStream.ToArray());
+                    世界地图_TMX.Layers[图层名字列表[i]].xData.Value = text64;
                 }
             }
+            else throw new Exception("TmxLayer: Unknown encoding.");
+
 
             return true;
         }
@@ -1524,6 +1564,10 @@ namespace TMX地图工具 {
                         var cityPos2 = point_city[neighborPos.X, neighborPos.Y];
                         //两点不在同一个区域且没有互相设置邻居城市
                         if ( cityPos1 != cityPos2 && !city_neighborCityList[cityPos1].Contains(cityPos2) ) {
+
+                            if ( !city_neighborCityList.ContainsKey(cityPos2) ) {
+                                throw new Exception(string.Format("坐标{0}异常!!!!!!!!!!!!!", neighborPos));
+                            }
                             city_neighborCityList[cityPos1].Add(cityPos2);
                             city_neighborCityList[cityPos2].Add(cityPos1);
                         }
