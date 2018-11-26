@@ -1845,14 +1845,30 @@ namespace TMX地图工具 {
             Point[,] point_郡首府 = new Point[地图宽度, 地图高度];
             foreach ( var 郡区域点列表 in 每个郡区域点列表 ) {
                 List<Point> 选出城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(郡区域点列表, "102", ref 选出城市点列表);
-
+                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area1_ID.Text, ref 选出城市点列表);
+                List<Point> 郡洲合一城市点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area_1_2_ID.Text, ref 郡洲合一城市点列表);
+                
                 Point 郡首府位置;
-                if ( 选出城市点列表.Count != 0 ) {
+                if ( 郡洲合一城市点列表.Count == 1 ) {
+
+                    郡首府位置 = 郡洲合一城市点列表[0];
+                }
+                else if ( 郡洲合一城市点列表.Count >= 2 ) {
+
+                    throw new Exception(string.Format("坐标{0},{1}多个郡首府异常!!!!!!!!!!!!!", 郡洲合一城市点列表[0], 郡洲合一城市点列表[1]));
+                }
+                else if ( 选出城市点列表.Count == 1 ) {
+
                     郡首府位置 = 选出城市点列表[0];
                 }
+                else if ( 选出城市点列表.Count >= 2 ) {
+
+                    throw new Exception(string.Format("坐标{0},{1}多个郡首府异常!!!!!!!!!!!!!", 选出城市点列表[0], 选出城市点列表[1]));
+                }
                 else {
-                    郡首府位置 = 郡区域点列表[0];
+                    throw new Exception(string.Format("坐标{0}区域没有郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
+                    //郡首府位置 = 郡区域点列表[0];
                 }
 
                 foreach ( var pos in 郡区域点列表 ) {
@@ -1863,18 +1879,36 @@ namespace TMX地图工具 {
             //设置每个点对应的洲府
             Dictionary<int, List<Point>> gid_洲区域点列表 = new Dictionary<int, List<Point>>();
             GetGetPointListForEachAreaWhichNotSameColor(ref gid_洲区域点列表, "Area2");
+            //List<List<Point>> 每个洲区域点列表 = new List<List<Point>>();
+            //GetPointListForEachArea(ref 每个洲区域点列表, "Area2");
 
             Point[,] point_洲首府 = new Point[地图宽度, 地图高度];
             foreach ( var 洲区域点列表 in gid_洲区域点列表.Values ) {
                 List<Point> 选出城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(洲区域点列表, "103", ref 选出城市点列表);
+                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area2_ID.Text, ref 选出城市点列表);
+                List<Point> 郡洲合一城市点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area_1_2_ID.Text, ref 郡洲合一城市点列表);
 
                 Point 洲首府位置;
-                if ( 选出城市点列表.Count != 0 ) {
+                if ( 郡洲合一城市点列表.Count == 1 ) {
+
+                    洲首府位置 = 郡洲合一城市点列表[0];
+                }
+                else if ( 郡洲合一城市点列表.Count >= 2 ) {
+
+                    throw new Exception(string.Format("坐标{0},{1}多个洲首府异常!!!!!!!!!!!!!", 郡洲合一城市点列表[0], 郡洲合一城市点列表[1]));
+                }
+                else if ( 选出城市点列表.Count == 1 ) {
+
                     洲首府位置 = 选出城市点列表[0];
                 }
+                else if ( 选出城市点列表.Count >= 2 ) {
+
+                    throw new Exception(string.Format("坐标{0},{1}多个洲首府异常!!!!!!!!!!!!!", 选出城市点列表[0], 选出城市点列表[1]));
+                }
                 else {
-                    洲首府位置 = 洲区域点列表[0];
+                    throw new Exception(string.Format("坐标{0}区域没有洲郡首府异常!!!!!!!!!!!!!", 洲区域点列表[0]));
+                    //洲首府位置 = 洲区域点列表[0];
                 }
 
                 foreach ( var pos in 洲区域点列表 ) {
@@ -2002,6 +2036,10 @@ namespace TMX地图工具 {
 
             陆地装饰label2.Text = "陆地装饰:" + 陆地trackBar1.Value.ToString() + "%";
             陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
+        }
+
+        private void tb_path_TextChanged( object sender, EventArgs e ) {
+
         }
     }
 }

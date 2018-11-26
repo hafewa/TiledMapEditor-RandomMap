@@ -42,6 +42,12 @@
             this.湖泊装饰trackBar4 = new System.Windows.Forms.TrackBar();
             this.陆地装饰label2 = new System.Windows.Forms.Label();
             this.陆地trackBar1 = new System.Windows.Forms.TrackBar();
+            this.Area1_ID = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.Area2_ID = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.Area_1_2_ID = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
@@ -230,11 +236,68 @@
             this.陆地trackBar1.Value = 5;
             this.陆地trackBar1.Scroll += new System.EventHandler(this.陆地trackBar1_Scroll);
             // 
+            // Area1_ID
+            // 
+            this.Area1_ID.Location = new System.Drawing.Point(393, 99);
+            this.Area1_ID.Name = "Area1_ID";
+            this.Area1_ID.Size = new System.Drawing.Size(36, 21);
+            this.Area1_ID.TabIndex = 20;
+            this.Area1_ID.Text = "102";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(334, 102);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(59, 12);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "Area1_ID:";
+            // 
+            // Area2_ID
+            // 
+            this.Area2_ID.Location = new System.Drawing.Point(521, 99);
+            this.Area2_ID.Name = "Area2_ID";
+            this.Area2_ID.Size = new System.Drawing.Size(36, 21);
+            this.Area2_ID.TabIndex = 22;
+            this.Area2_ID.Text = "103";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(462, 102);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(59, 12);
+            this.label3.TabIndex = 21;
+            this.label3.Text = "Area2_ID:";
+            // 
+            // Area_1_2_ID
+            // 
+            this.Area_1_2_ID.Location = new System.Drawing.Point(676, 99);
+            this.Area_1_2_ID.Name = "Area_1_2_ID";
+            this.Area_1_2_ID.Size = new System.Drawing.Size(36, 21);
+            this.Area_1_2_ID.TabIndex = 24;
+            this.Area_1_2_ID.Text = "100";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(593, 102);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(77, 12);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "Area_1-2_ID:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.Area_1_2_ID);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.Area2_ID);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.Area1_ID);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.陆地装饰label2);
             this.Controls.Add(this.陆地trackBar1);
             this.Controls.Add(this.湖泊装饰label5);
@@ -288,6 +351,12 @@
         private System.Windows.Forms.TrackBar 湖泊装饰trackBar4;
         private System.Windows.Forms.Label 陆地装饰label2;
         private System.Windows.Forms.TrackBar 陆地trackBar1;
+        private System.Windows.Forms.TextBox Area1_ID;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox Area2_ID;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox Area_1_2_ID;
+        private System.Windows.Forms.Label label4;
     }
 }
 
