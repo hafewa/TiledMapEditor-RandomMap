@@ -18,8 +18,8 @@ namespace TMX地图工具 {
         public int 地图高度 = 300;
 
         public int[,] 遮罩;
-        int layer4层起始标记索引 = -1;
-        int 随机起始索引 = -1;
+        int 大地图标记起始索引 = -1;
+        int 随机地图标记起始索引 = -1;
 
         public int[,] 地型地图;
         public int[,] 土地等级地图;
@@ -195,40 +195,11 @@ namespace TMX地图工具 {
             int[,] Terrain = new int[地图宽度, 地图高度];
             int[,] Landform = new int[地图宽度, 地图高度];
 
-            //int[,] LandLevel = new int[地图宽度, 地图高度];
-            //int[,] ResourceLevel = new int[地图宽度, 地图高度];
-
-            //List<int[,]> 新标记数组列表 = new List<int[,]> { LandLevel, ResourceLevel };
-            //List<int[,]> 原标记数组列表 = new List<int[,]> { 土地等级地图, 资源等级地图 };
-
-            int firstGid = 0;
-            int firstGid2 = 0;
-
-            if ( !世界地图_TMX.Tilesets.Contains("随机地图标记") ) {
-                MessageBox.Show("模板不包含<<随机地图标记>>图集,请重新选择地图模板!");
-                return false;
-            }
-            else {
-                firstGid = 世界地图_TMX.Tilesets["随机地图标记"].FirstGid;
-            }
-
-            if ( !世界地图_TMX.Tilesets.Contains("标记") ) {
-                MessageBox.Show("模板不包含<<标记>>图集,请重新选择地图模板!");
-                return false;
-            }
-            else {
-                firstGid2 = 世界地图_TMX.Tilesets["标记"].FirstGid;
-            }
-
             for ( int col, row = 0; row < 地图高度; row++ ) {
                 for ( col = 0; col < 地图宽度; col++ ) {
 
-                    Terrain[col, row] = 地型地图[col, row] + firstGid;
-                    Landform[col, row] = Layer2映射地图[col, row] + firstGid;
-
-                    //for ( int i = 0; i < 新标记数组列表.Count; i++ ) {
-                    //    新标记数组列表[i][col, row] = 原标记数组列表[i][col, row] + firstGid2;
-                    //}
+                    Terrain[col, row] = 地型地图[col, row] + 随机地图标记起始索引;
+                    Landform[col, row] = Layer2映射地图[col, row] + 随机地图标记起始索引;
                 }
             }
 
@@ -920,18 +891,21 @@ namespace TMX地图工具 {
                 地图高度 = 世界地图_TMX.Height;
 
                 var tilesets = 世界地图_TMX.Tilesets;
-                if ( !tilesets.Contains("标记") ) {
-                    MessageBox.Show("地图文件不包含'标记'图集,请先添加图集!");
+                var tsxName = "大地图-标记";
+                if ( !tilesets.Contains(tsxName) ) {
+
+                    MessageBox.Show(string.Format("地图文件不包含'{0}'图集,请先添加图集!", tsxName));
                     return false;
                 }
-                layer4层起始标记索引 = tilesets["标记"].FirstGid;
+                大地图标记起始索引 = tilesets[tsxName].FirstGid;
 
-                if ( !tilesets.Contains("随机地图标记") ) {
+                tsxName = "随机地图标记";
+                if ( !tilesets.Contains(tsxName) ) {
 
-                    MessageBox.Show("地图文件不包含'随机地图标记'图集,请先添加图集!");
+                    MessageBox.Show(string.Format("地图文件不包含'{0}'图集,请先添加图集!", tsxName));
                     return false;
                 }
-                随机起始索引 = tilesets["随机地图标记"].FirstGid;
+                随机地图标记起始索引 = tilesets[tsxName].FirstGid;
             }
 
             return true;
@@ -1000,6 +974,10 @@ namespace TMX地图工具 {
 
                         propertyDict = tileset.Tiles[index].Properties;
                         return true;
+                    }
+                    if ( index < tileset.TileCount ) {
+
+                        MessageBox.Show(string.Format("Gid:{0}对应的图集\"{1}\"没有设置tsx图块属性!", gid, tileset.Name));
                     }
                 }
             }
@@ -1267,14 +1245,14 @@ namespace TMX地图工具 {
         }
 
         bool IsWhiteMask( int x, int y ) {
-            return 遮罩[x, y] == white + 随机起始索引;
+            return 遮罩[x, y] == white + 随机地图标记起始索引;
         }
         bool IsWhiteMask( Point pos ) {
             return IsWhiteMask(pos.X, pos.Y);
         }
 
         bool IsLakeInMask( int x, int y ) {
-            return 遮罩[x, y] == 地型_湖泊 + 随机起始索引;
+            return 遮罩[x, y] == 地型_湖泊 + 随机地图标记起始索引;
         }
 
         bool IsLakeInMask( Point pos ) {
@@ -1282,7 +1260,7 @@ namespace TMX地图工具 {
         }
 
         bool IsMountInMask( int x, int y ) {
-            return 遮罩[x, y] == 山体 + 随机起始索引;
+            return 遮罩[x, y] == 山体 + 随机地图标记起始索引;
         }
 
         bool IsMountInMask( Point pos ) {
@@ -1290,7 +1268,7 @@ namespace TMX地图工具 {
         }
 
         bool IsForestInMask( int x, int y ) {
-            return 遮罩[x, y] == 树林 + 随机起始索引;
+            return 遮罩[x, y] == 树林 + 随机地图标记起始索引;
         }
 
         bool IsForestInMask( Point pos ) {
@@ -1298,7 +1276,7 @@ namespace TMX地图工具 {
         }
 
         bool IsBlackInMask( int x, int y ) {
-            return 遮罩[x, y] == black +  随机起始索引;
+            return 遮罩[x, y] == black +  随机地图标记起始索引;
         }
 
         bool IsBlackInMask( Point pos ) {
@@ -1418,17 +1396,127 @@ namespace TMX地图工具 {
 
         #endregion
 
-        #region 地块等级初始化
+        #region 根据城市土地等级生成区域土地等级
         private void btn_level_Click( object sender, EventArgs e ) {
 
-            string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap", "tmx");
+            string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_Landlevel", "tmx");
             if( savePath == null ) {
                 return;
             }
 
-            //世界地图生成步骤();
+            if ( !TmxIsLoaded() ) {
+                return;
+            }
 
-            if ( !地图数据转化成CSV格式() ) {
+            //全图所有城市点
+            List<Point> cityList = new List<Point>();
+            if ( !GetCityPointListInAllMap(ref cityList) ) {
+                return;
+            }
+            if ( cityList.Count == 0 ) {
+                MessageBox.Show("城市个数为0!");
+                return;
+            }
+
+            //收集城市点对应的区域点列表
+            Dictionary<Point, List<Point>> city_areaList = new Dictionary<Point, List<Point>>();
+            int maxListCount = 0;
+            GetCityAreaPointList(ref city_areaList, "Area", cityList, ref maxListCount);
+
+            int[,] 土地等级概率生成表 = new int[,] {
+                {60, 30, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {20, 50, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 50, 20,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 30, 60,},
+            };
+
+            int 城市最大等级 = 18;
+            int 土地等级起始索引 = 0;
+            int[,] 土地等级 = new int[地图宽度, 地图高度];
+
+            //随机土地等级
+            foreach ( var item in city_areaList ) {
+
+                var cityPos = item.Key;
+                var landLevel = GetPropertyByPos("LandLevel", "level", cityPos);
+                //if ( landLevel == string.Empty ) continue;
+                int 城市等级索引 = int.Parse(landLevel) - 1;
+
+                foreach ( var 当前遍历坐标 in item.Value ) {
+
+                    int x = 当前遍历坐标.X;
+                    int y = 当前遍历坐标.Y;
+
+                    int random = Range(1, 100);
+                    int sum = 0;
+
+                    for ( int Lv = 0; Lv < 城市最大等级; Lv++ ) {
+
+                        sum += 土地等级概率生成表[城市等级索引, Lv];
+                        if ( random <= sum ) {
+                            土地等级[x, y] = 土地等级起始索引 + Lv;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //修复城市的土地等级
+            foreach ( var cityPos in city_areaList.Keys ) {
+                var matrix = GetPropertyByPos("Layer3", "matrix", cityPos);
+                //if ( matrix == string.Empty ) continue;
+                int width, height;
+                var list = matrix.Split('-');
+                if ( list.Length >= 2 && int.TryParse(list[0], out width) && int.TryParse(list[1], out height) ) {
+
+                    Rectangle rect = new Rectangle(cityPos.X, cityPos.Y - height + 1, width, height);
+                    //if ( cityPos == new Point(31,281)) {
+                    //    Log("X:" + rect.X);
+                    //    Log("Y:" + rect.Y);
+                    //    Log("Top:" + rect.Top);
+                    //    Log("Bottom:" + rect.Bottom);
+                    //    Log("Left:" + rect.Left);
+                    //    Log("Right:" + rect.Right);
+                    //}
+
+                    var landLevel = GetPropertyByPos("LandLevel", "level", cityPos);
+                    //if ( landLevel == string.Empty ) continue;
+                    int 城市等级索引 = int.Parse(landLevel) - 1;
+                    for ( int row = rect.Top; row < rect.Bottom; row++ ) {
+                        for ( int col = rect.Left; col < rect.Right; col++ ) {
+
+                            土地等级[col, row] = 土地等级起始索引 + 城市等级索引;
+                        }
+                    }
+                }
+            }
+
+            //保存随机结果到tml
+            for ( int column = 0, row = 0; row < 地图高度; row++ ) {
+                for ( column = 0; column < 地图宽度; column++ ) {
+
+                    土地等级[column, row] +=  大地图标记起始索引;
+                }
+            }
+
+            List<int[,]> 待转化数组列表 = new List<int[,]> { 土地等级, };
+            List<string> 图层名字列表 = new List<string>() { "LandLevel", };
+
+            if ( !SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
                 return;
             }
 
@@ -1619,19 +1707,10 @@ namespace TMX地图工具 {
 
             int[,] Area = new int[地图宽度, 地图高度];
 
-            int firstGid;
-            if ( !世界地图_TMX.Tilesets.Contains("随机地图标记") ) {
-                MessageBox.Show("模板不包含<<随机地图标记>>图集,请重新选择地图模板!");
-                return;
-            }
-            else {
-                firstGid = 世界地图_TMX.Tilesets["随机地图标记"].FirstGid;
-            }
-
             for ( int column = 0, row = 0; row < 地图高度; row++ ) {
                 for ( column = 0; column < 地图宽度; column++ ) {
                     if ( 区域地图[column, row] != 0 ) {
-                        Area[column, row] = 区域地图[column, row] + firstGid;
+                        Area[column, row] = 区域地图[column, row] + 随机地图标记起始索引;
                     }
                     else {
                         Area[column, row] = 0;
@@ -2036,10 +2115,6 @@ namespace TMX地图工具 {
 
             陆地装饰label2.Text = "陆地装饰:" + 陆地trackBar1.Value.ToString() + "%";
             陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
-        }
-
-        private void tb_path_TextChanged( object sender, EventArgs e ) {
-
         }
     }
 }

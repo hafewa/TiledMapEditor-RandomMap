@@ -102,18 +102,17 @@
             // 
             // btn_level
             // 
-            this.btn_level.Location = new System.Drawing.Point(669, 501);
+            this.btn_level.Location = new System.Drawing.Point(353, 213);
             this.btn_level.Name = "btn_level";
             this.btn_level.Size = new System.Drawing.Size(103, 23);
             this.btn_level.TabIndex = 5;
-            this.btn_level.Text = "预生成地块等级";
+            this.btn_level.Text = "随机土地等级";
             this.btn_level.UseVisualStyleBackColor = true;
-            this.btn_level.Visible = false;
             this.btn_level.Click += new System.EventHandler(this.btn_level_Click);
             // 
             // btn_segment
             // 
-            this.btn_segment.Location = new System.Drawing.Point(485, 140);
+            this.btn_segment.Location = new System.Drawing.Point(353, 162);
             this.btn_segment.Name = "btn_segment";
             this.btn_segment.Size = new System.Drawing.Size(106, 23);
             this.btn_segment.TabIndex = 6;
@@ -123,7 +122,7 @@
             // 
             // btn_export_area
             // 
-            this.btn_export_area.Location = new System.Drawing.Point(485, 271);
+            this.btn_export_area.Location = new System.Drawing.Point(574, 162);
             this.btn_export_area.Name = "btn_export_area";
             this.btn_export_area.Size = new System.Drawing.Size(106, 23);
             this.btn_export_area.TabIndex = 7;
