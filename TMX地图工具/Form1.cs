@@ -155,7 +155,7 @@ namespace TMX地图工具 {
             progressBar1.Value += 模块占比;
 
             //模块3
-            地型随机();
+            if( checkBox_terrain.Checked ) 地型随机();
             progressBar1.Value += 模块占比;
 
             //模块4
@@ -163,7 +163,27 @@ namespace TMX地图工具 {
             progressBar1.Value += 模块占比;
 
             //模块5
-            if ( 地图数据转化成CSV格式() ) {
+            int[,] Terrain = new int[地图宽度, 地图高度];
+            int[,] Landform = new int[地图宽度, 地图高度];
+
+            for ( int col, row = 0; row < 地图高度; row++ ) {
+                for ( col = 0; col < 地图宽度; col++ ) {
+
+                    Terrain[col, row] = 地型地图[col, row] + 随机地图标记起始索引;
+                    Landform[col, row] = Layer2映射地图[col, row] + 随机地图标记起始索引;
+                }
+            }
+
+            List<int[,]> 待转化数组列表 = new List<int[,]> { Landform };
+            List<string> 图层名字列表 = new List<string>() { "Landform" };
+
+            if ( checkBox_terrain.Checked ) {
+
+                待转化数组列表.Add(Terrain);
+                图层名字列表.Add("Terrain");
+            }
+            
+            if ( SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
                 SaveTmx(path);
             }
             else {
@@ -188,25 +208,6 @@ namespace TMX地图工具 {
 
         void 地图重置(int[,] 地图) {
             地图 = new int[地图宽度, 地图高度];
-        }
-
-        public bool 地图数据转化成CSV格式() {
-
-            int[,] Terrain = new int[地图宽度, 地图高度];
-            int[,] Landform = new int[地图宽度, 地图高度];
-
-            for ( int col, row = 0; row < 地图高度; row++ ) {
-                for ( col = 0; col < 地图宽度; col++ ) {
-
-                    Terrain[col, row] = 地型地图[col, row] + 随机地图标记起始索引;
-                    Landform[col, row] = Layer2映射地图[col, row] + 随机地图标记起始索引;
-                }
-            }
-
-            List<int[,]> 待转化数组列表 = new List<int[,]> { Terrain, Landform };
-            List<string> 图层名字列表 = new List<string>() { "Terrain", "Landform" };
-
-            return  SaveDataForEachLayer(待转化数组列表, 图层名字列表);
         }
 
         #region 地型随机
@@ -1484,14 +1485,6 @@ namespace TMX地图工具 {
                 if ( list.Length >= 2 && int.TryParse(list[0], out width) && int.TryParse(list[1], out height) ) {
 
                     Rectangle rect = new Rectangle(cityPos.X, cityPos.Y - height + 1, width, height);
-                    //if ( cityPos == new Point(31,281)) {
-                    //    Log("X:" + rect.X);
-                    //    Log("Y:" + rect.Y);
-                    //    Log("Top:" + rect.Top);
-                    //    Log("Bottom:" + rect.Bottom);
-                    //    Log("Left:" + rect.Left);
-                    //    Log("Right:" + rect.Right);
-                    //}
 
                     var landLevel = GetPropertyByPos("LandLevel", "level", cityPos);
                     //if ( landLevel == string.Empty ) continue;

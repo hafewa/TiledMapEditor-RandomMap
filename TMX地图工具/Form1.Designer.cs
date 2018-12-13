@@ -48,6 +48,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.Area_1_2_ID = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.checkBox_terrain = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
@@ -286,11 +287,24 @@
             this.label4.TabIndex = 23;
             this.label4.Text = "Area_1-2_ID:";
             // 
+            // checkBox_terrain
+            // 
+            this.checkBox_terrain.AutoSize = true;
+            this.checkBox_terrain.Checked = true;
+            this.checkBox_terrain.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_terrain.Location = new System.Drawing.Point(201, 96);
+            this.checkBox_terrain.Name = "checkBox_terrain";
+            this.checkBox_terrain.Size = new System.Drawing.Size(48, 16);
+            this.checkBox_terrain.TabIndex = 25;
+            this.checkBox_terrain.Text = "地型";
+            this.checkBox_terrain.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.checkBox_terrain);
             this.Controls.Add(this.Area_1_2_ID);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.Area2_ID);
@@ -356,6 +370,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox Area_1_2_ID;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox checkBox_terrain;
     }
 }
 
