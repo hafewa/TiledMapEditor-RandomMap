@@ -992,9 +992,13 @@ namespace TMX地图工具 {
         /// <param name="pos"></param>
         /// <returns></returns>
         public string GetPropertyByPos( string layerName, string typeName, Point pos ) {
+            
+            return GetPropertyByPos(layerName, typeName, pos.X, pos.Y);
+        }
+        public string GetPropertyByPos( string layerName, string typeName, int x, int y ) {
 
             int gid = 0;
-            if ( GetLayerGid(layerName, pos.X, pos.Y, ref gid) ) {
+            if ( GetLayerGid(layerName, x, y, ref gid) ) {
 
                 PropertyDict propertyDict = null;
                 if ( GetTileProperty(gid, ref propertyDict) ) {
@@ -1398,6 +1402,9 @@ namespace TMX地图工具 {
         #endregion
 
         #region 根据城市土地等级生成区域土地等级
+
+        int 城市土地最大等级 = 18;
+        int 土地等级图块在图集中起始索引 = 0;
         private void btn_level_Click( object sender, EventArgs e ) {
 
             string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_Landlevel", "tmx");
@@ -1445,9 +1452,8 @@ namespace TMX地图工具 {
                 {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 30, 60,},
             };
 
-            int 城市最大等级 = 18;
-            int 土地等级起始索引 = 0;
             int[,] 土地等级 = new int[地图宽度, 地图高度];
+            int 土地等级图块gid的起始编号 = 大地图标记起始索引 + 土地等级图块在图集中起始索引;
 
             //随机土地等级
             foreach ( var item in city_areaList ) {
@@ -1465,11 +1471,11 @@ namespace TMX地图工具 {
                     int random = Range(1, 100);
                     int sum = 0;
 
-                    for ( int Lv = 0; Lv < 城市最大等级; Lv++ ) {
+                    for ( int Lv = 0; Lv < 城市土地最大等级; Lv++ ) {
 
                         sum += 土地等级概率生成表[城市等级索引, Lv];
                         if ( random <= sum ) {
-                            土地等级[x, y] = 土地等级起始索引 + Lv;
+                            土地等级[x, y] = 土地等级图块gid的起始编号 + Lv;
                             break;
                         }
                     }
@@ -1492,17 +1498,9 @@ namespace TMX地图工具 {
                     for ( int row = rect.Top; row < rect.Bottom; row++ ) {
                         for ( int col = rect.Left; col < rect.Right; col++ ) {
 
-                            土地等级[col, row] = 土地等级起始索引 + 城市等级索引;
+                            土地等级[col, row] = 土地等级图块gid的起始编号 + 城市等级索引;
                         }
                     }
-                }
-            }
-
-            //保存随机结果到tml
-            for ( int column = 0, row = 0; row < 地图高度; row++ ) {
-                for ( column = 0; column < 地图宽度; column++ ) {
-
-                    土地等级[column, row] +=  大地图标记起始索引;
                 }
             }
 
@@ -1514,6 +1512,146 @@ namespace TMX地图工具 {
             }
 
             SaveTmx(savePath);
+        }
+        #endregion
+
+        #region 根据土地等级随机土地资源
+        private void btn_resource_Click( object sender, EventArgs e ) {
+
+            string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_LandResource", "tmx");
+            if ( savePath == null ) {
+                return;
+            }
+
+            if ( !TmxIsLoaded() ) {
+                return;
+            }
+
+            var tilesets = 世界地图_TMX.Tilesets;
+            var tsxName = "大地图-资源";
+            if ( !tilesets.Contains(tsxName) ) {
+
+                MessageBox.Show(string.Format("地图文件不包含'{0}'图集,请先添加图集!", tsxName));
+                return ;
+            }
+            int 大地图资源起始索引 = tilesets[tsxName].FirstGid;
+            int 资源类型图块在图集中起始索引 = 0;
+
+            int[,] 土地资源概率生成表 = new int[,] {
+                {10, 10, 09, 09, 08, 08, 08, 08, 06, 06, 06, 04, 04, 04, 02, 02, 02, 02,},
+                {10, 10, 09, 09, 08, 08, 06, 06, 05, 05, 05, 04, 04, 04, 03, 03, 03, 03,},
+                {00, 00, 02, 02, 04, 04, 06, 06, 05, 05, 05, 06, 06, 06, 04, 04, 04, 04,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 04, 04, 04, 06, 06, 06, 05, 05, 05, 05,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 06, 06, 06, 06,},
+                {10, 10, 09, 09, 08, 08, 08, 08, 06, 06, 06, 04, 04, 04, 02, 02, 02, 02,},
+                {10, 10, 09, 09, 08, 08, 06, 06, 05, 05, 05, 04, 04, 04, 03, 03, 03, 03,},
+                {00, 00, 02, 02, 04, 04, 06, 06, 05, 05, 05, 06, 06, 06, 04, 04, 04, 04,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 04, 04, 04, 06, 06, 06, 05, 05, 05, 05,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 06, 06, 06, 06,},
+                {15, 15, 13, 13, 12, 12, 12, 12, 09, 09, 09, 06, 06, 06, 02, 02, 02, 02,},
+                {15, 15, 13, 13, 12, 12, 09, 09, 08, 08, 08, 06, 06, 06, 04, 04, 04, 04,},
+                {00, 00, 04, 04, 06, 06, 09, 09, 07, 07, 07, 09, 09, 09, 06, 06, 06, 06,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 06, 06, 06, 09, 09, 09, 08, 08, 08, 08,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 10, 10, 10,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 03, 02, 02, 02, 01, 01, 01, 01,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 03, 02, 02, 02, 01, 01, 01, 01,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 04, 04, 04, 03, 03, 03, 02, 02, 02, 02,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 03, 02, 02, 02, 02,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 04, 04, 04, 04,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 03, 02, 02, 01, 01,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 03, 02, 02, 01, 01,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 04, 04, 04, 03, 03, 02, 02,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 03, 03, 02, 02,},
+                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 04, 04,},
+                {15, 15, 12, 12, 10, 10, 10, 10, 07, 07, 07, 04, 04, 04, 03, 03, 02, 02,},
+                {15, 15, 12, 12, 10, 10, 10, 10, 07, 07, 07, 03, 03, 03, 03, 03, 03, 03,},
+                {00, 00, 06, 06, 10, 10, 10, 10, 06, 06, 06, 03, 03, 03, 04, 04, 05, 05,},
+            };
+
+            //读取原Layer2图层数据
+            int[,] 资源类型 = new int[地图宽度, 地图高度];
+            if ( !SetGidOfLayer("Layer2", ref 资源类型) ) {
+                return;
+            }
+            
+            //随机资源种类
+            int 土地等级gid的起始编号 = 大地图标记起始索引 + 土地等级图块在图集中起始索引;
+            int 资源种类gid的起始编号 = 大地图资源起始索引 + 资源类型图块在图集中起始索引;
+            int 资源种类 = 28;
+            for ( int y = 0; y < 地图高度; y++ ) {
+                for ( int x = 0; x < 地图宽度; x++ ) {
+
+                    if( !可生成土地资源(x, y) ) {
+                        continue;
+                    }
+
+                    int gid = 0;
+                    if ( GetLayerGid("LandLevel", x, y, ref gid) && gid != 0 ) {
+
+                        int 土地等级 = gid - 土地等级gid的起始编号;
+                        if ( 土地等级 > 城市土地最大等级 ) continue;
+
+                        int random = Range(1, 100);
+                        int sum = 0;
+
+                        //资源种类 - 3:去掉三种空地
+                        for ( int 资源索引 = 0; 资源索引 < 资源种类 - 3; 资源索引++ ) {
+
+                            sum += 土地资源概率生成表[资源索引, 土地等级];
+                            if ( random <= sum ) {
+                                资源类型[x, y] = 资源种类gid的起始编号 + 资源索引;
+                                break;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+
+            //修复城市的土地等级
+            for ( int y = 0; y < 地图高度; y++ ) {
+                for ( int x = 0; x < 地图宽度; x++ ) {
+
+                    var matrix = GetPropertyByPos("Layer3", "matrix", x, y);
+                    //if ( matrix == string.Empty ) continue;
+                    int width, height;
+                    var list = matrix.Split('-');
+                    if ( list.Length >= 2 && int.TryParse(list[0], out width) && int.TryParse(list[1], out height) ) {
+
+                        Rectangle rect = new Rectangle(x, y - height + 1, width, height);
+                        for ( int row = rect.Top; row < rect.Bottom; row++ ) {
+                            for ( int col = rect.Left; col < rect.Right; col++ ) {
+
+                                资源类型[col, row] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            //保存修改
+            List<int[,]> 待转化数组列表 = new List<int[,]> { 资源类型, };
+            List<string> 图层名字列表 = new List<string>() { "Layer2", };
+
+            if ( !SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
+                return;
+            }
+
+            SaveTmx(savePath);
+        }
+
+        bool 可生成土地资源(int x, int y ) {
+
+            var TerrainType = GetPropertyByPos("Layer1", "TerrainType", x, y);
+            if ( TerrainType == "3" ) return false;
+
+            TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
+            if ( TerrainType == "7" ) return false;
+
+            var matrix = GetPropertyByPos("Layer3", "matrix", x, y);
+            if ( matrix != string.Empty ) return false;
+
+            return true;
         }
         #endregion
 
@@ -2109,6 +2247,7 @@ namespace TMX地图工具 {
             陆地装饰label2.Text = "陆地装饰:" + 陆地trackBar1.Value.ToString() + "%";
             陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
         }
+
     }
 }
 

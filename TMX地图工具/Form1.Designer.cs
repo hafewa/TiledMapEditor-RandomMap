@@ -49,6 +49,7 @@
             this.Area_1_2_ID = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.checkBox_terrain = new System.Windows.Forms.CheckBox();
+            this.btn_resource = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
@@ -299,11 +300,22 @@
             this.checkBox_terrain.Text = "地型";
             this.checkBox_terrain.UseVisualStyleBackColor = true;
             // 
+            // btn_resource
+            // 
+            this.btn_resource.Location = new System.Drawing.Point(353, 264);
+            this.btn_resource.Name = "btn_resource";
+            this.btn_resource.Size = new System.Drawing.Size(103, 23);
+            this.btn_resource.TabIndex = 26;
+            this.btn_resource.Text = "随机土地资源";
+            this.btn_resource.UseVisualStyleBackColor = true;
+            this.btn_resource.Click += new System.EventHandler(this.btn_resource_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.btn_resource);
             this.Controls.Add(this.checkBox_terrain);
             this.Controls.Add(this.Area_1_2_ID);
             this.Controls.Add(this.label4);
@@ -371,6 +383,7 @@
         private System.Windows.Forms.TextBox Area_1_2_ID;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox checkBox_terrain;
+        private System.Windows.Forms.Button btn_resource;
     }
 }
 
