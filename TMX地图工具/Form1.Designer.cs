@@ -250,9 +250,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(334, 102);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 12);
+            this.label2.Size = new System.Drawing.Size(65, 12);
             this.label2.TabIndex = 19;
-            this.label2.Text = "Area1_ID:";
+            this.label2.Text = "郡首府_ID:";
             // 
             // Area2_ID
             // 
@@ -267,9 +267,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(462, 102);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 12);
+            this.label3.Size = new System.Drawing.Size(65, 12);
             this.label3.TabIndex = 21;
-            this.label3.Text = "Area2_ID:";
+            this.label3.Text = "洲首府_ID:";
             // 
             // Area_1_2_ID
             // 
@@ -286,7 +286,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(77, 12);
             this.label4.TabIndex = 23;
-            this.label4.Text = "Area_1-2_ID:";
+            this.label4.Text = "郡洲合一_ID:";
             // 
             // checkBox_terrain
             // 
