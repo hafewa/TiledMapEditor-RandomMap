@@ -1460,8 +1460,12 @@ namespace TMX地图工具 {
 
                 var cityPos = item.Key;
                 var landLevel = GetPropertyByPos("LandLevel", "level", cityPos);
-                //if ( landLevel == string.Empty ) continue;
-                int 城市等级索引 = int.Parse(landLevel) - 1;
+
+                int 城市等级索引 = 0;
+                if ( !int.TryParse(landLevel, out 城市等级索引) ) {
+                    MessageBox.Show(string.Format("城市{0}:不包含土地等级信息!!!!!!!!!!", cityPos));
+                    return;
+                }
 
                 foreach ( var 当前遍历坐标 in item.Value ) {
 
@@ -1473,7 +1477,7 @@ namespace TMX地图工具 {
 
                     for ( int Lv = 0; Lv < 城市土地最大等级; Lv++ ) {
 
-                        sum += 土地等级概率生成表[城市等级索引, Lv];
+                        sum += 土地等级概率生成表[城市等级索引 - 1, Lv];
                         if ( random <= sum ) {
                             土地等级[x, y] = 土地等级图块gid的起始编号 + Lv;
                             break;
@@ -1591,7 +1595,7 @@ namespace TMX地图工具 {
                         continue;
                     }
 
-                    if( 必须生成空地资源(x, y) ) {
+                    if( 必须生成空地地块(x, y) ) {
                         random = Range(1, 100);
                         sum = 0;
                         for ( int 资源索引 = 空地起始索引; 资源索引 < 资源种类; 资源索引++ ) {
@@ -1685,7 +1689,7 @@ namespace TMX地图工具 {
             SaveTmx(savePath);
         }
 
-        bool 必须生成空地资源(int x, int y ) {
+        bool 必须生成空地地块(int x, int y ) {
 
             if (
                 该位置为湖泊(x, y) ||
@@ -2142,25 +2146,31 @@ namespace TMX地图工具 {
                 GetCityPosListInAreaByPropertyValue(郡区域点列表, Area2_ID.Text, ref 城市103点列表);
 
                 Point 郡首府位置;
-                if ( 城市102点列表.Count == 1 ) {
+
+                if( (城市102点列表.Count + 城市103点列表.Count) >= 2 ) {
+
+                    if ( 城市102点列表.Count >= 2 ) {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个102郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市102点列表[1]));
+                    }
+                    else if ( 城市103点列表.Count >= 2 ) {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个103郡首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
+                    }
+                    else {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个102和103郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市103点列表[1]));
+                    }
+                    return;
+                }
+                else if ( 城市102点列表.Count == 1 ) {
 
                     郡首府位置 = 城市102点列表[0];
-                }
-                else if ( 城市102点列表.Count >= 2 ) {
-
-                    throw new Exception(string.Format("坐标{0},{1}多个102郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市102点列表[1]));
                 }
                 else if( 城市103点列表.Count == 1 ) {
 
                     郡首府位置 = 城市103点列表[0];
                 }
-                else if ( 城市103点列表.Count >= 2 ) {
-
-                    throw new Exception(string.Format("坐标{0},{1}多个103郡首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
-                }
                 else {
-                    throw new Exception(string.Format("坐标{0}区域没有郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
-                    //郡首府位置 = 郡区域点列表[0];
+                    MessageBox.Show(string.Format("坐标{0}区域没有102和103郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
+                    return;
                 }
 
                 foreach ( var pos in 郡区域点列表 ) {
@@ -2180,18 +2190,35 @@ namespace TMX地图工具 {
                 List<Point> 城市103点列表 = new List<Point>();
                 GetCityPosListInAreaByPropertyValue(洲区域点列表, Area2_ID.Text, ref 城市103点列表);
 
+                List<Point> 城市100点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area_1_2_ID.Text, ref 城市100点列表);
+
                 Point 洲首府位置;
-                if ( 城市103点列表.Count == 1 ) {
+
+                if ( ( 城市100点列表.Count + 城市103点列表.Count ) >= 2 ) {
+
+                    if ( 城市100点列表.Count >= 2 ) {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个100洲首府异常!!!!!!!!!!!!!", 城市100点列表[0], 城市100点列表[1]));
+                    }
+                    else if ( 城市103点列表.Count >= 2 ) {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个103洲首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
+                    }
+                    else {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个100和103洲首府异常!!!!!!!!!!!!!", 城市100点列表[0], 城市103点列表[1]));
+                    }
+                    return;
+                }
+                else if ( 城市100点列表.Count == 1 ) {
+
+                    洲首府位置 = 城市100点列表[0];
+                }
+                else if ( 城市103点列表.Count == 1 ) {
 
                     洲首府位置 = 城市103点列表[0];
                 }
-                else if ( 城市103点列表.Count >= 2 ) {
-
-                    throw new Exception(string.Format("坐标{0},{1}多个103洲首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
-                }
                 else {
-                    throw new Exception(string.Format("坐标{0}区域没有洲郡首府异常!!!!!!!!!!!!!", 洲区域点列表[0]));
-                    //洲首府位置 = 洲区域点列表[0];
+                    MessageBox.Show(string.Format("坐标{0}区域没有100和103洲首府异常!!!!!!!!!!!!!", 洲区域点列表[0]));
+                    return;
                 }
 
                 foreach ( var pos in 洲区域点列表 ) {
