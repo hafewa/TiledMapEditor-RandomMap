@@ -2134,27 +2134,29 @@ namespace TMX地图工具 {
 
             Point[,] point_郡首府 = new Point[地图宽度, 地图高度];
             foreach ( var 郡区域点列表 in 每个郡区域点列表 ) {
-                List<Point> 选出城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area1_ID.Text, ref 选出城市点列表);
-                List<Point> 郡洲合一城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area_1_2_ID.Text, ref 郡洲合一城市点列表);
+
+                List<Point> 城市102点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area1_ID.Text, ref 城市102点列表);
+
+                List<Point> 城市103点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area2_ID.Text, ref 城市103点列表);
 
                 Point 郡首府位置;
-                if ( 郡洲合一城市点列表.Count == 1 ) {
+                if ( 城市102点列表.Count == 1 ) {
 
-                    郡首府位置 = 郡洲合一城市点列表[0];
+                    郡首府位置 = 城市102点列表[0];
                 }
-                else if ( 郡洲合一城市点列表.Count >= 2 ) {
+                else if ( 城市102点列表.Count >= 2 ) {
 
-                    throw new Exception(string.Format("坐标{0},{1}多个郡首府异常!!!!!!!!!!!!!", 郡洲合一城市点列表[0], 郡洲合一城市点列表[1]));
+                    throw new Exception(string.Format("坐标{0},{1}多个102郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市102点列表[1]));
                 }
-                else if ( 选出城市点列表.Count == 1 ) {
+                else if( 城市103点列表.Count == 1 ) {
 
-                    郡首府位置 = 选出城市点列表[0];
+                    郡首府位置 = 城市103点列表[0];
                 }
-                else if ( 选出城市点列表.Count >= 2 ) {
+                else if ( 城市103点列表.Count >= 2 ) {
 
-                    throw new Exception(string.Format("坐标{0},{1}多个郡首府异常!!!!!!!!!!!!!", 选出城市点列表[0], 选出城市点列表[1]));
+                    throw new Exception(string.Format("坐标{0},{1}多个103郡首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
                 }
                 else {
                     throw new Exception(string.Format("坐标{0}区域没有郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
@@ -2174,27 +2176,18 @@ namespace TMX地图工具 {
 
             Point[,] point_洲首府 = new Point[地图宽度, 地图高度];
             foreach ( var 洲区域点列表 in gid_洲区域点列表.Values ) {
-                List<Point> 选出城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area2_ID.Text, ref 选出城市点列表);
-                List<Point> 郡洲合一城市点列表 = new List<Point>();
-                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area_1_2_ID.Text, ref 郡洲合一城市点列表);
+
+                List<Point> 城市103点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(洲区域点列表, Area2_ID.Text, ref 城市103点列表);
 
                 Point 洲首府位置;
-                if ( 郡洲合一城市点列表.Count == 1 ) {
+                if ( 城市103点列表.Count == 1 ) {
 
-                    洲首府位置 = 郡洲合一城市点列表[0];
+                    洲首府位置 = 城市103点列表[0];
                 }
-                else if ( 郡洲合一城市点列表.Count >= 2 ) {
+                else if ( 城市103点列表.Count >= 2 ) {
 
-                    throw new Exception(string.Format("坐标{0},{1}多个洲首府异常!!!!!!!!!!!!!", 郡洲合一城市点列表[0], 郡洲合一城市点列表[1]));
-                }
-                else if ( 选出城市点列表.Count == 1 ) {
-
-                    洲首府位置 = 选出城市点列表[0];
-                }
-                else if ( 选出城市点列表.Count >= 2 ) {
-
-                    throw new Exception(string.Format("坐标{0},{1}多个洲首府异常!!!!!!!!!!!!!", 选出城市点列表[0], 选出城市点列表[1]));
+                    throw new Exception(string.Format("坐标{0},{1}多个103洲首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
                 }
                 else {
                     throw new Exception(string.Format("坐标{0}区域没有洲郡首府异常!!!!!!!!!!!!!", 洲区域点列表[0]));
