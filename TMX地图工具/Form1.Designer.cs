@@ -50,6 +50,13 @@
             this.label4 = new System.Windows.Forms.Label();
             this.checkBox_terrain = new System.Windows.Forms.CheckBox();
             this.btn_resource = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
@@ -104,7 +111,7 @@
             // 
             // btn_level
             // 
-            this.btn_level.Location = new System.Drawing.Point(353, 213);
+            this.btn_level.Location = new System.Drawing.Point(356, 282);
             this.btn_level.Name = "btn_level";
             this.btn_level.Size = new System.Drawing.Size(103, 23);
             this.btn_level.TabIndex = 5;
@@ -302,7 +309,7 @@
             // 
             // btn_resource
             // 
-            this.btn_resource.Location = new System.Drawing.Point(353, 264);
+            this.btn_resource.Location = new System.Drawing.Point(492, 282);
             this.btn_resource.Name = "btn_resource";
             this.btn_resource.Size = new System.Drawing.Size(103, 23);
             this.btn_resource.TabIndex = 26;
@@ -310,11 +317,79 @@
             this.btn_resource.UseVisualStyleBackColor = true;
             this.btn_resource.Click += new System.EventHandler(this.btn_resource_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(610, 213);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 29;
+            this.button2.Text = "浏览";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(411, 215);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(193, 21);
+            this.textBox1.TabIndex = 28;
+            this.textBox1.Text = "地块数据生成.xlsx";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(352, 218);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(59, 12);
+            this.label5.TabIndex = 27;
+            this.label5.Text = "表格路径:";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(537, 255);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(83, 21);
+            this.textBox2.TabIndex = 30;
+            this.textBox2.Text = "资源生成概率";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(490, 258);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(47, 12);
+            this.label6.TabIndex = 31;
+            this.label6.Text = "表名字:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(346, 258);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(47, 12);
+            this.label7.TabIndex = 33;
+            this.label7.Text = "表名字:";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(393, 255);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(83, 21);
+            this.textBox3.TabIndex = 32;
+            this.textBox3.Text = "土地等级概率";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.btn_resource);
             this.Controls.Add(this.checkBox_terrain);
             this.Controls.Add(this.Area_1_2_ID);
@@ -384,6 +459,13 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox checkBox_terrain;
         private System.Windows.Forms.Button btn_resource;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox textBox3;
     }
 }
 

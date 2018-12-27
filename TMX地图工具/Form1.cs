@@ -1,7 +1,9 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -686,7 +688,7 @@ namespace TMX地图工具 {
 
         #region 公用函数
 
-        public void Log(string msg) {
+        public static void Log(string msg) {
             Console.WriteLine(msg);
         }
 
@@ -1431,26 +1433,11 @@ namespace TMX地图工具 {
             int maxListCount = 0;
             GetCityAreaPointList(ref city_areaList, "Area", cityList, ref maxListCount);
 
-            int[,] 土地等级概率生成表 = new int[,] {
-                {60, 30, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {20, 50, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10, 00,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 40, 20, 10,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 20, 50, 20,},
-                {00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 10, 30, 60,},
-            };
+            float[,] 土地等级概率生成表 = null;
+
+            if ( !LoadXlsxFileData(textBox1.Text, textBox3.Text, ref 土地等级概率生成表) ) {
+                return;
+            }
 
             int[,] 土地等级 = new int[地图宽度, 地图高度];
             int 土地等级图块gid的起始编号 = 大地图标记起始索引 + 土地等级图块在图集中起始索引;
@@ -1473,7 +1460,7 @@ namespace TMX地图工具 {
                     int y = 当前遍历坐标.Y;
 
                     int random = Range(1, 100);
-                    int sum = 0;
+                    float sum = 0;
 
                     for ( int Lv = 0; Lv < 城市土地最大等级; Lv++ ) {
 
@@ -1541,33 +1528,10 @@ namespace TMX地图工具 {
             int 大地图资源起始索引 = tilesets[tsxName].FirstGid;
             int 资源类型图块在图集中起始索引 = 0;
 
-            float[,] 土地资源概率生成表 = new float[,] {
-                {09.53f,    09.53f, 09.53f, 09.53f, 09.53f, 09.53f, 05.89f, 05.89f, 05.89f, 04.77f, 04.77f, 04.77f, 03.78f, 03.78f, 03.78f, 03.64f, 03.64f, 03.64f,},
-                {09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	09.53f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	08.83f,	08.83f,	08.83f,	07.15f,	07.15f,	07.15f,	05.67f,	05.67f,	05.67f,	05.46f,	05.46f,	05.46f,},
-                {14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	08.83f,	08.83f,	08.83f,	07.15f,	07.15f,	07.15f,	05.67f,	05.67f,	05.67f,	05.46f,	05.46f,	05.46f,},
-                {14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	14.29f,	08.83f,	08.83f,	08.83f,	07.15f,	07.15f,	07.15f,	05.67f,	05.67f,	05.67f,	05.46f,	05.46f,	05.46f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	08.83f,	08.83f,	08.83f,	07.15f,	07.15f,	07.15f,	05.67f,	05.67f,	05.67f,	05.46f,	05.46f,	05.46f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.67f,	05.67f,	05.67f,	05.46f,	05.46f,	05.46f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	05.89f,	05.89f,	05.89f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	04.77f,	04.77f,	04.77f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	03.78f,	03.78f,	03.78f,	03.64f,	03.64f,	03.64f,},
-                {00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	00.00f,	03.64f,	03.64f,	03.64f,},
-            };
+            float[,] 土地资源概率生成表 = null;
+            if(!LoadXlsxFileData(textBox1.Text, textBox2.Text, ref 土地资源概率生成表) ) {
+                return;
+            }
 
             float[] 空地概率 = new float[] { 33, 33, 34 };
 
@@ -2350,6 +2314,140 @@ namespace TMX地图工具 {
             陆地装饰物概率 = 陆地trackBar1.Value / 100.0f;
         }
 
+        /// <summary>
+        /// 获取excel内容
+        /// </summary>
+        /// <param name="filePath">excel文件路径</param>
+        /// <returns></returns>
+        public static DataTable ImportExcel( string filePath, string sheetName ) {
+            DataTable dt = new DataTable();
+            using ( FileStream fsRead = File.OpenRead(filePath) ) {
+                IWorkbook wk = null;
+                //获取后缀名
+                string extension = filePath.Substring(filePath.LastIndexOf(".")).ToString().ToLower();
+                //判断是否是excel文件
+                if ( extension == ".xlsx" || extension == ".xls" ) {
+                    //判断excel的版本
+                    if ( extension == ".xlsx" ) {
+                        wk = new XSSFWorkbook(fsRead);
+                    }
+                    else {
+                        wk = new HSSFWorkbook(fsRead);
+                    }
+
+                    //获取第一个sheet
+                    ISheet sheet = wk.GetSheet(sheetName);
+                    Log(sheet.SheetName);
+                    //获取第一行
+                    IRow headrow = sheet.GetRow(0);
+                    //创建列
+                    for ( int i = headrow.FirstCellNum; i < headrow.Cells.Count; i++ ) {
+
+                        DataColumn datacolum = new DataColumn(headrow.GetCell(i).StringCellValue);
+                        dt.Columns.Add(datacolum);
+                    }
+
+                    //读取每行,从第二行起
+                    for ( int r = 1; r <= sheet.LastRowNum; r++ ) {
+                        bool result = false;
+                        DataRow dr = dt.NewRow();
+                        //获取当前行
+                        IRow row = sheet.GetRow(r);
+                        //读取每列
+                        for ( int j = 0; j < row.Cells.Count; j++ ) {
+
+                            ICell cell = row.GetCell(j); //一个单元格
+                            string value = GetCellValue(cell);//获取单元格的值
+                            dr[j] = value; 
+                            Log(string.Format(" {0}", dr[j]));
+
+                            //全为空则不取
+                            if ( dr[j].ToString() != "" ) {
+                                result = true;
+                            }
+                        }
+                        if ( result == true ) {
+                            dt.Rows.Add(dr); //把每行追加到DataTable
+                        }
+                    }
+                }
+
+            }
+            return dt;
+        }
+        //对单元格进行判断取值
+        private static string GetCellValue( ICell cell ) {
+            if ( cell == null )
+                return string.Empty;
+            switch ( cell.CellType ) {
+                case CellType.Blank: //空数据类型 这里类型注意一下，不同版本NPOI大小写可能不一样,有的版本是Blank（首字母大写)
+                    return string.Empty;
+                case CellType.Boolean: //bool类型
+                    return cell.BooleanCellValue.ToString();
+                case CellType.Error:
+                    return cell.ErrorCellValue.ToString();
+                case CellType.Numeric: //数字类型
+                    if ( HSSFDateUtil.IsCellDateFormatted(cell) )//日期类型
+                    {
+                        return cell.DateCellValue.ToString();
+                    }
+                    else //其它数字
+                    {
+                        return cell.NumericCellValue.ToString();
+                    }
+                case CellType.Unknown: //无法识别类型
+                default: //默认类型
+                    return cell.ToString();//
+                case CellType.String: //string 类型
+                    return cell.StringCellValue;
+                case CellType.Formula: //带公式类型
+                    try {
+                        HSSFFormulaEvaluator e = new HSSFFormulaEvaluator(cell.Sheet.Workbook);
+                        e.EvaluateInCell(cell);
+                        return cell.ToString();
+                    }
+                    catch {
+                        return cell.NumericCellValue.ToString();
+                    }
+            }
+        }
+
+        float[,] GetFloatArray( DataTable dt ) {
+
+            float[,] result = new float[dt.Rows.Count, dt.Columns.Count - 1];
+
+            for ( int row = 0; row < dt.Rows.Count; row++ ) {
+
+                DataRow dr = dt.Rows[row];
+                for ( int col = 1; col < dt.Columns.Count; col++ ) {
+
+                    string value = dr[col].ToString();
+                    result[row, col - 1] = float.Parse(value);
+                }
+
+            }
+            return result;
+        }
+
+        bool LoadXlsxFileData(string path, string sheetName, ref float[,] array ) {
+
+            if ( !File.Exists(path) ) {
+                MessageBox.Show(string.Format("文件{0}不存在,重新选择!", path));
+                return false;
+            }
+            DataTable dt = ImportExcel(path, sheetName);
+            array = GetFloatArray(dt);
+
+            return true;
+        }
+
+        private void button2_Click( object sender, EventArgs e ) {
+
+            var path = GetFilePathDialog("表格(*.xlsx)|*.xlsx|所有文件|*.*", "地块数据生成", "xlsx");
+            if ( path != null ) {
+                textBox1.Text = path;
+            }
+        }
     }
 }
 
