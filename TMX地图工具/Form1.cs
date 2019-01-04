@@ -1435,7 +1435,8 @@ namespace TMX地图工具 {
 
             float[,] 土地等级概率生成表 = null;
 
-            if ( !LoadXlsxFileData(textBox1.Text, textBox3.Text, ref 土地等级概率生成表) ) {
+            IWorkbook wk = GetIWorkbook(textBox1.Text);
+            if ( !GetXlsxTable(wk, textBox3.Text, ref 土地等级概率生成表) ) {
                 return;
             }
 
@@ -1529,9 +1530,12 @@ namespace TMX地图工具 {
             int 资源类型图块在图集中起始索引 = 0;
 
             float[,] 土地资源概率生成表 = null;
-            if(!LoadXlsxFileData(textBox1.Text, textBox2.Text, ref 土地资源概率生成表) ) {
+            IWorkbook wk = GetIWorkbook(textBox1.Text);
+            if (!GetXlsxTable(wk, textBox2.Text, ref 土地资源概率生成表) ) {
                 return;
             }
+
+            float 资源占比 = GetResourceProbability(wk, "Sheet2");
 
             float[] 空地概率 = new float[] { 33, 33, 34 };
 
@@ -1582,7 +1586,7 @@ namespace TMX地图工具 {
 
                             //40%资源,60%空地
                             random = Range(1, 100);
-                            if ( random <= 40 ) {
+                            if ( random <= 资源占比 ) {
 
                                 random = Range(1, 100);
                                 sum = 0;
@@ -2319,10 +2323,58 @@ namespace TMX地图工具 {
         /// </summary>
         /// <param name="filePath">excel文件路径</param>
         /// <returns></returns>
-        public static DataTable ImportExcel( string filePath, string sheetName ) {
+        public static DataTable ImportExcel( IWorkbook wk, string sheetName ) {
+
             DataTable dt = new DataTable();
+            
+            //获取第一个sheet
+            ISheet sheet = wk.GetSheet(sheetName);
+            Log(sheet.SheetName);
+            //获取第一行
+            IRow headrow = sheet.GetRow(0);
+            //创建列
+            for ( int i = headrow.FirstCellNum; i < headrow.Cells.Count; i++ ) {
+
+                DataColumn datacolum = new DataColumn(headrow.GetCell(i).StringCellValue);
+                dt.Columns.Add(datacolum);
+            }
+
+            //读取每行,从第二行起
+            for ( int r = 1; r <= sheet.LastRowNum; r++ ) {
+                bool result = false;
+                DataRow dr = dt.NewRow();
+                //获取当前行
+                IRow row = sheet.GetRow(r);
+                //读取每列
+                for ( int j = 0; j < row.Cells.Count; j++ ) {
+
+                    ICell cell = row.GetCell(j); //一个单元格
+                    string value = GetCellValue(cell);//获取单元格的值
+                    dr[j] = value;
+                    Log(string.Format(" {0}", dr[j]));
+
+                    //全为空则不取
+                    if ( dr[j].ToString() != "" ) {
+                        result = true;
+                    }
+                }
+                if ( result == true ) {
+                    dt.Rows.Add(dr); //把每行追加到DataTable
+                }
+            }
+
+            return dt;
+        }
+
+        static IWorkbook GetIWorkbook( string filePath ) {
+
+            if ( !File.Exists(filePath) ) {
+                MessageBox.Show(string.Format("文件{0}不存在,重新选择!", filePath));
+                return null;
+            }
+
+            IWorkbook wk = null;
             using ( FileStream fsRead = File.OpenRead(filePath) ) {
-                IWorkbook wk = null;
                 //获取后缀名
                 string extension = filePath.Substring(filePath.LastIndexOf(".")).ToString().ToLower();
                 //判断是否是excel文件
@@ -2334,47 +2386,12 @@ namespace TMX地图工具 {
                     else {
                         wk = new HSSFWorkbook(fsRead);
                     }
-
-                    //获取第一个sheet
-                    ISheet sheet = wk.GetSheet(sheetName);
-                    Log(sheet.SheetName);
-                    //获取第一行
-                    IRow headrow = sheet.GetRow(0);
-                    //创建列
-                    for ( int i = headrow.FirstCellNum; i < headrow.Cells.Count; i++ ) {
-
-                        DataColumn datacolum = new DataColumn(headrow.GetCell(i).StringCellValue);
-                        dt.Columns.Add(datacolum);
-                    }
-
-                    //读取每行,从第二行起
-                    for ( int r = 1; r <= sheet.LastRowNum; r++ ) {
-                        bool result = false;
-                        DataRow dr = dt.NewRow();
-                        //获取当前行
-                        IRow row = sheet.GetRow(r);
-                        //读取每列
-                        for ( int j = 0; j < row.Cells.Count; j++ ) {
-
-                            ICell cell = row.GetCell(j); //一个单元格
-                            string value = GetCellValue(cell);//获取单元格的值
-                            dr[j] = value; 
-                            Log(string.Format(" {0}", dr[j]));
-
-                            //全为空则不取
-                            if ( dr[j].ToString() != "" ) {
-                                result = true;
-                            }
-                        }
-                        if ( result == true ) {
-                            dt.Rows.Add(dr); //把每行追加到DataTable
-                        }
-                    }
                 }
 
             }
-            return dt;
+            return wk;
         }
+
         //对单元格进行判断取值
         private static string GetCellValue( ICell cell ) {
             if ( cell == null )
@@ -2428,17 +2445,34 @@ namespace TMX地图工具 {
             }
             return result;
         }
+        
+        bool GetXlsxTable( IWorkbook wk, string sheetName, ref float[,] array ) {
 
-        bool LoadXlsxFileData(string path, string sheetName, ref float[,] array ) {
-
-            if ( !File.Exists(path) ) {
-                MessageBox.Show(string.Format("文件{0}不存在,重新选择!", path));
+            if ( wk == null ) {
                 return false;
             }
-            DataTable dt = ImportExcel(path, sheetName);
+
+            DataTable dt = ImportExcel(wk, sheetName);
             array = GetFloatArray(dt);
 
             return true;
+        }
+
+        float GetResourceProbability( IWorkbook wk, string sheetName ) {
+
+            if ( wk == null ) {
+                return 0;
+            }
+
+            ISheet sheet2 = wk.GetSheet(sheetName);
+            string str = GetCellValue(sheet2.GetRow(2).GetCell(11));
+
+            float prob = 0;
+            if( float.TryParse(str, out prob) ) {
+                Log("资源占比:" + prob * 100 + "%");
+                return prob * 100;
+            }
+            return prob;
         }
 
         private void button2_Click( object sender, EventArgs e ) {
