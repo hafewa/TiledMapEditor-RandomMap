@@ -1563,7 +1563,11 @@ namespace TMX地图工具 {
                         continue;
                     }
 
-                    if( 必须生成空地地块(x, y) ) {
+                    if ( 该位置为桥梁(x, y) ) {
+                        continue;
+                    }
+
+                    if ( 必须生成空地地块(x, y) ) {
                         random = Range(1, 100);
                         sum = 0;
                         for ( int 资源索引 = 空地起始索引; 资源索引 < 资源种类; 资源索引++ ) {
@@ -1675,6 +1679,13 @@ namespace TMX地图工具 {
 
             var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
             if ( TerrainType == "7" ) return true;
+            return false;
+        }
+
+        bool 该位置为桥梁( int x, int y ) {
+
+            var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
+            if ( TerrainType == "6" ) return true;
             return false;
         }
 
@@ -2124,7 +2135,7 @@ namespace TMX地图工具 {
                         MessageBox.Show(string.Format("坐标{0},{1}多个103郡首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
                     }
                     else {
-                        MessageBox.Show(string.Format("坐标{0},{1}多个102和103郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市103点列表[1]));
+                        MessageBox.Show(string.Format("坐标{0},{1}多个102和103郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市103点列表[0]));
                     }
                     return;
                 }
@@ -2172,7 +2183,7 @@ namespace TMX地图工具 {
                         MessageBox.Show(string.Format("坐标{0},{1}多个103洲首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
                     }
                     else {
-                        MessageBox.Show(string.Format("坐标{0},{1}多个100和103洲首府异常!!!!!!!!!!!!!", 城市100点列表[0], 城市103点列表[1]));
+                        MessageBox.Show(string.Format("坐标{0},{1}多个100和103洲首府异常!!!!!!!!!!!!!", 城市100点列表[0], 城市103点列表[0]));
                     }
                     return;
                 }
