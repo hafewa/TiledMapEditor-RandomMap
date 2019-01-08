@@ -2248,7 +2248,15 @@ namespace TMX地图工具 {
                 sheet1.SetColumnWidth(i, 256 * 12);
             }
 
-            int count = 0;
+
+            //设置列标题
+            List<string> titleList = new List<string> {"坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字", };
+            IRow headRow = sheet1.CreateRow(0);
+            for ( int col = 0; col < titleList.Count; col++ ) {
+                headRow.CreateCell(col).SetCellValue(titleList[col]);
+            }
+
+            int count = 1;
             progressBar1.Minimum = 0;
             progressBar1.Maximum = 地图高度 * 地图宽度;
 
@@ -2271,8 +2279,8 @@ namespace TMX地图工具 {
                     row.CreateCell(6).SetCellValue(资源名字[x, y]);
 
 
-                    count++;
                     progressBar1.Value = count;
+                    count++;
                 }
             }
 
