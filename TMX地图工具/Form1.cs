@@ -1401,6 +1401,47 @@ namespace TMX地图工具 {
 
         }
 
+        bool 该位置为山体( int x, int y ) {
+
+            var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
+            if ( TerrainType == "7" ) return true;
+            return false;
+        }
+
+        bool 该位置为桥梁( int x, int y ) {
+
+            var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
+            if ( TerrainType == "6" ) return true;
+            return false;
+        }
+
+        bool 该位置为湖泊( int x, int y ) {
+
+            var TerrainType = GetPropertyByPos("Layer1", "TerrainType", x, y);
+            if ( TerrainType == "3" ) return true;
+            return false;
+        }
+
+        bool 该位置为河流( int x, int y ) {
+
+            var value = GetPropertyByPos("River", "HasRiver", x, y);
+            if ( value == "true" ) return true;
+            return false;
+        }
+
+        bool 该位置为道路( int x, int y ) {
+
+            var value = GetPropertyByPos("Road", "hasRoad", x, y);
+            if ( value == "true" ) return true;
+            return false;
+        }
+
+        bool 该位置为城市( int x, int y ) {
+
+            var matrix = GetPropertyByPos("Layer3", "matrix", x, y);
+            if ( matrix != string.Empty ) return true;
+            return false;
+        }
         #endregion
 
         #region 根据城市土地等级生成区域土地等级
@@ -1675,47 +1716,6 @@ namespace TMX地图工具 {
             return false;
         }
 
-        bool 该位置为山体( int x, int y ) {
-
-            var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
-            if ( TerrainType == "7" ) return true;
-            return false;
-        }
-
-        bool 该位置为桥梁( int x, int y ) {
-
-            var TerrainType = GetPropertyByPos("Layer2", "TerrainType", x, y);
-            if ( TerrainType == "6" ) return true;
-            return false;
-        }
-
-        bool 该位置为湖泊( int x, int y ) {
-
-            var TerrainType = GetPropertyByPos("Layer1", "TerrainType", x, y);
-            if ( TerrainType == "3" ) return true;
-            return false;
-        }
-
-        bool 该位置为河流( int x, int y ) {
-
-            var value = GetPropertyByPos("River", "HasRiver", x, y);
-            if ( value == "true" ) return true;
-            return false;
-        }
-
-        bool 该位置为道路( int x, int y ) {
-
-            var value = GetPropertyByPos("Road", "hasRoad", x, y);
-            if ( value == "true" ) return true;
-            return false;
-        }
-
-        bool 该位置为城市( int x, int y ) {
-
-            var matrix = GetPropertyByPos("Layer3", "matrix", x, y);
-            if ( matrix != string.Empty ) return true;
-            return false;
-        }
         #endregion
 
         #region 城市行政区域划分
@@ -2250,7 +2250,7 @@ namespace TMX地图工具 {
 
 
             //设置列标题
-            List<string> titleList = new List<string> {"坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字", };
+            List<string> titleList = new List<string> {"坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字","name" };
             IRow headRow = sheet1.CreateRow(0);
             for ( int col = 0; col < titleList.Count; col++ ) {
                 headRow.CreateCell(col).SetCellValue(titleList[col]);
@@ -2278,6 +2278,16 @@ namespace TMX地图工具 {
                     row.CreateCell(5).SetCellValue(土地等级[x, y]);
                     row.CreateCell(6).SetCellValue(资源名字[x, y]);
 
+                    var name = "";
+                    foreach ( var layer in 世界地图_TMX.Layers ) {
+                        
+                        var temp = GetPropertyByPos(layer.Name, "Name", x, y);
+                        if ( temp != string.Empty ) {
+
+                            name = temp;
+                        }
+                    }
+                    row.CreateCell(7).SetCellValue(name);
 
                     progressBar1.Value = count;
                     count++;
@@ -2291,8 +2301,87 @@ namespace TMX地图工具 {
             sw.Close();
             MessageBox.Show("导出完成!");
         }
+        private void btn_export_link_Click( object sender, EventArgs e ) {
+
+            if ( !TmxIsLoaded() ) {
+                return;
+            }
+
+            string savePath = OpenSaveFileDialog("Excel表格(*.xlsx)|*.xlsx|所有文件|*.*", "WorldMap_PosLink", "xlsx", true);
+            if ( savePath == null ) {
+                return;
+            }
+
+            //全图所有城市点
+            List<Point> cityList = new List<Point>();
+            if ( !GetCityPointListInAllMap(ref cityList) ) {
+                return;
+            }
+            if ( cityList.Count == 0 ) {
+                MessageBox.Show("城市个数为0!");
+                return;
+            }
+
+            //记录城市连通状态
+            道路遍历状态 = new int[地图宽度, 地图高度];
+            城市坐标_相连城市坐标.Clear();
+            foreach ( var pos in cityList ) {
+
+                遍历相邻城市(pos);
+            }
+
+            //设置excel表格
+            IWorkbook workbook = new XSSFWorkbook();
+            ISheet sheet1 = workbook.CreateSheet("城市连接状态");
+
+            for ( int i = 0; i < cityList.Count; i++ ) {
+                //row.CreateCell(i).SetCellValue(cityList[i].ToString());
+                sheet1.SetColumnWidth(i, 256 * 12);
+            }
+
+
+            //设置列标题
+            List<string> titleList = new List<string> { "坐标", "显性连接", "隐形连接", };
+            IRow headRow = sheet1.CreateRow(0);
+            for ( int col = 0; col < titleList.Count; col++ ) {
+                headRow.CreateCell(col).SetCellValue(titleList[col]);
+            }
+
+            int count = 1;
+            progressBar1.Minimum = 0;
+            progressBar1.Maximum = cityList.Count;
+
+            foreach ( var pos in cityList ) {
+
+                IRow row = sheet1.CreateRow(count);
+
+                row.CreateCell(0).SetCellValue(string.Format("{0}_{1}", pos.X, pos.Y));
+
+                progressBar1.Value = count;
+                count++;
+            }
+
+            FileStream sw = File.Create(savePath);
+
+            workbook.Write(sw);
+
+            sw.Close();
+
+            MessageBox.Show("导出完成!");
+        }
+
+        int[,] 道路遍历状态;
+        Dictionary<Point, List<Point>> 城市坐标_相连城市坐标 = new Dictionary<Point, List<Point>>();
+        void 遍历相邻城市(Point cityPos) {
+            var matrix = GetPropertyByPos("Layer3", "matrix", cityPos.X, cityPos.Y);
+            if ( matrix != string.Empty ) {
+
+            }
+            List<Point> 城市相邻坐标 = new List<Point>();
+
+        }
         #endregion
-        
+
         private void Form1_Load( object sender, EventArgs e ) {
             湖泊label2.Text = "湖泊:" + 湖泊trackBar1.Value.ToString() + "%";
             湖泊概率 = 湖泊trackBar1.Value / 100.0f;
@@ -2501,6 +2590,7 @@ namespace TMX地图工具 {
                 textBox1.Text = path;
             }
         }
+
     }
 }
 

@@ -57,6 +57,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox3 = new System.Windows.Forms.TextBox();
+            this.btn_export_link = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.湖泊trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.山体trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.树林trackBar3)).BeginInit();
@@ -378,11 +379,22 @@
             this.textBox3.TabIndex = 32;
             this.textBox3.Text = "土地等级概率";
             // 
+            // btn_export_link
+            // 
+            this.btn_export_link.Location = new System.Drawing.Point(574, 333);
+            this.btn_export_link.Name = "btn_export_link";
+            this.btn_export_link.Size = new System.Drawing.Size(106, 23);
+            this.btn_export_link.TabIndex = 34;
+            this.btn_export_link.Text = "导出城市连接";
+            this.btn_export_link.UseVisualStyleBackColor = true;
+            this.btn_export_link.Click += new System.EventHandler(this.btn_export_link_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
+            this.Controls.Add(this.btn_export_link);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.label6);
@@ -466,6 +478,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Button btn_export_link;
     }
 }
 
