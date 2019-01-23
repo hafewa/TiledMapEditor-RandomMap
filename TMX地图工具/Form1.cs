@@ -52,15 +52,26 @@ namespace TMX地图工具 {
         List<Size> 相邻四边偏移量 = new List<Size> { new Size(-1, 0), new Size(0, -1), new Size(1, 0), new Size(0, 1) };
 
         List<Size> 相邻八边偏移量 = new List<Size> {
-        new Size(-1, -1),
-        new Size(0, -1),
-        new Size(1, -1),
-        new Size(1, 0),
-        new Size(1, 1),
-        new Size(0, 1),
-        new Size(-1, 1),
-        new Size(-1, 0),
-    };
+            new Size(-1, -1),
+            new Size(0, -1),
+            new Size(1, -1),
+            new Size(1, 0),
+            new Size(1, 1),
+            new Size(0, 1),
+            new Size(-1, 1),
+            new Size(-1, 0),
+        };
+        public enum Directions {
+            N = 0,
+            NE,
+            E,
+            SE,
+            S,
+            SW,
+            W,
+            NW,
+        };
+
         public Form1() {
             InitializeComponent();
         }
@@ -68,7 +79,7 @@ namespace TMX地图工具 {
         private void btn_brow_Click( object sender, EventArgs e ) {
 
             var path = GetFilePathDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_New", "tmx");
-            if(path != null ) {
+            if ( path != null ) {
 
                 tb_path.Text = path;
                 世界地图_TMX = null;
@@ -77,12 +88,12 @@ namespace TMX地图工具 {
 
         private void btn_export_excel_Click( object sender, EventArgs e ) {
 
-            if( !TmxIsLoaded() ) {
+            if ( !TmxIsLoaded() ) {
                 return;
             }
 
             string savePath = OpenSaveFileDialog("Excel表格(*.xlsx)|*.xlsx|所有文件|*.*", "WorldMap_New", "xlsx", true);
-            if( savePath == null ) {
+            if ( savePath == null ) {
                 return;
             }
 
@@ -106,7 +117,7 @@ namespace TMX地图工具 {
 
             for ( int y = 0; y < 地图高度; y++ ) {
                 for ( int x = 0; x < 地图宽度; x++ ) {
-                    row = sheet1.CreateRow(count);                
+                    row = sheet1.CreateRow(count);
 
                     row.CreateCell(0).SetCellValue(string.Format("{0}-{1}", x, y));
 
@@ -146,7 +157,7 @@ namespace TMX地图工具 {
 
             //模块1
             if ( !TmxIsLoaded() ) {
-                return ;
+                return;
             }
             progressBar1.Value += 模块占比;
 
@@ -157,7 +168,7 @@ namespace TMX地图工具 {
             progressBar1.Value += 模块占比;
 
             //模块3
-            if( checkBox_terrain.Checked ) 地型随机();
+            if ( checkBox_terrain.Checked ) 地型随机();
             progressBar1.Value += 模块占比;
 
             //模块4
@@ -184,7 +195,7 @@ namespace TMX地图工具 {
                 待转化数组列表.Add(Terrain);
                 图层名字列表.Add("Terrain");
             }
-            
+
             if ( SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
                 SaveTmx(path);
             }
@@ -208,7 +219,7 @@ namespace TMX地图工具 {
             return true;
         }
 
-        void 地图重置(int[,] 地图) {
+        void 地图重置( int[,] 地图 ) {
             地图 = new int[地图宽度, 地图高度];
         }
 
@@ -221,7 +232,7 @@ namespace TMX地图工具 {
         int 已生成草地格子数;
         void 地型随机() {
             地图重置(地型地图);
-            
+
             已生成湖泊格子数 = 0;
 
             List<Point> 待生成湖泊集合 = new List<Point>();
@@ -322,7 +333,7 @@ namespace TMX地图工具 {
         void 设置湖泊( Point pos ) {
 
             地型地图[pos.X, pos.Y] = 地型_湖泊;
-            已生成湖泊格子数++;           
+            已生成湖泊格子数++;
         }
 
         bool 已生成湖泊到达总占比() {
@@ -332,9 +343,9 @@ namespace TMX地图工具 {
 
         bool 可生成河流( Point pos ) {
 
-            if( IsLake(pos) ||
+            if ( IsLake(pos) ||
                 IsBlackInMask(pos) ||
-                已生成湖泊到达总占比 () ||
+                已生成湖泊到达总占比() ||
                 当前坐标N格范围包含特定地型(pos, 2, IsMountInMask) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsForestInMask) ||
                 当前坐标N格范围包含特定地型(pos, 2, IsWhiteMask)
@@ -414,7 +425,7 @@ namespace TMX地图工具 {
 
                 var pos = 遮罩空白区域点集合.Random();
 
-                if( 该位置可放树林(pos) ) {
+                if ( 该位置可放树林(pos) ) {
 
                     地型格子数 = Range(9, 20);
 
@@ -424,15 +435,14 @@ namespace TMX地图工具 {
                 遮罩空白区域点集合.Remove(pos);
             }
 
-            while ( 全图点集合.Count != 0 && (!湖泊装饰物达到总占比() || !陆地装饰物达到总占比()) ) {
+            while ( 全图点集合.Count != 0 && ( !湖泊装饰物达到总占比() || !陆地装饰物达到总占比() ) ) {
                 var pos = 全图点集合.Random();
 
                 if ( 该位置可放湖泊装饰物(pos) ) {
                     设置湖泊装饰物(pos);
                 }
 
-                if( 该位置可放陆地装饰物(pos) )
-                {
+                if ( 该位置可放陆地装饰物(pos) ) {
                     设置陆地装饰物(pos);
                 }
 
@@ -527,7 +537,7 @@ namespace TMX地图工具 {
 
             Layer2映射地图[pos.X, pos.Y] = 山体;
             已生成的山体格子++;
-        } 
+        }
 
         #endregion
 
@@ -688,7 +698,7 @@ namespace TMX地图工具 {
 
         #region 公用函数
 
-        public static void Log(string msg) {
+        public static void Log( string msg ) {
             Console.WriteLine(msg);
         }
 
@@ -704,7 +714,7 @@ namespace TMX地图工具 {
         public static int Range( int min, int max ) {
             var seed = Guid.NewGuid().GetHashCode();
             Random ran = new Random(seed);
-            
+
             return ran.Next(min, max + 1);
         }
 
@@ -791,7 +801,7 @@ namespace TMX地图工具 {
             return null;
         }
 
-        public void SaveTmx(string filePath) {
+        public void SaveTmx( string filePath ) {
             if ( filePath != null ) {
                 //保存TMX地图
                 StreamWriter swriter = new StreamWriter(filePath, false, new UTF8Encoding(false));
@@ -950,7 +960,7 @@ namespace TMX地图工具 {
         /// <param name="y"></param>
         /// <param name="gid"></param>
         /// <returns></returns>
-        public bool GetLayerGid(string layerName, int x, int y, ref int gid) {
+        public bool GetLayerGid( string layerName, int x, int y, ref int gid ) {
             if ( !世界地图_TMX.Layers.Contains(layerName) ) {
                 MessageBox.Show(string.Format("模板不包含图层<{0}>,请重新选择地图模板!", layerName));
                 return false;
@@ -960,7 +970,7 @@ namespace TMX地图工具 {
 
             return true;
         }
-        
+
         /// <summary>
         /// 获取gid对应的属性
         /// </summary>
@@ -994,7 +1004,7 @@ namespace TMX地图工具 {
         /// <param name="pos"></param>
         /// <returns></returns>
         public string GetPropertyByPos( string layerName, string typeName, Point pos ) {
-            
+
             return GetPropertyByPos(layerName, typeName, pos.X, pos.Y);
         }
         public string GetPropertyByPos( string layerName, string typeName, int x, int y ) {
@@ -1028,7 +1038,7 @@ namespace TMX地图工具 {
         /// 收集全图城市点
         /// </summary>
         /// <param name="cityList"></param>
-        bool GetCityPointListInAllMap(ref List<Point> cityList) {
+        bool GetCityPointListInAllMap( ref List<Point> cityList ) {
             string layerName = "Layer3";
 
             for ( int y = 0; y < 地图高度; y++ ) {
@@ -1049,7 +1059,7 @@ namespace TMX地图工具 {
         /// 获取区域内的城市点
         /// </summary>
         /// <returns></returns>
-        bool GetCityPosInArea( List<Point> areaList , ref List<Point> cityList ) {
+        bool GetCityPosInArea( List<Point> areaList, ref List<Point> cityList ) {
             string layerName = "Layer3";
 
             foreach ( var pos in areaList ) {
@@ -1132,7 +1142,7 @@ namespace TMX地图工具 {
         /// <param name="pos"></param>
         void CollectCityPosByColor( ref List<Point> cityPosList, int[,] point_colorGid, int cityColorGid, Point pos ) {
 
-            if( !IsInMap(pos) ||
+            if ( !IsInMap(pos) ||
                 findleap[pos.X, pos.Y] == 1 ||
                 point_colorGid[pos.X, pos.Y] != cityColorGid
                 ) {
@@ -1148,7 +1158,7 @@ namespace TMX地图工具 {
                 //if ( IsInMap(neighborPos) 
                 //    && point_colorGid[neighborPos.X, neighborPos.Y] == cityColorGid
                 //    && findleap[neighborPos.X, neighborPos.Y] != 1 ) 
-                    {
+                {
 
                     CollectCityPosByColor(ref cityPosList, point_colorGid, cityColorGid, neighborPos);
                 }
@@ -1190,12 +1200,12 @@ namespace TMX地图工具 {
         /// </summary>
         /// <param name="每个郡区域点列表"></param>
         /// <param name="layerName"></param>
-        void GetPointListForEachArea(ref List<List<Point>> 每个郡区域点列表 , string layerName) {
+        void GetPointListForEachArea( ref List<List<Point>> 每个郡区域点列表, string layerName ) {
             int[,] point_LayerGid = new int[地图宽度, 地图高度];
             if ( !SetGidOfLayer(layerName, ref point_LayerGid) ) {//收集每个郡区域
                 return;
             }
-            
+
             findleap = new int[地图宽度, 地图高度];
             for ( int row = 0; row < 地图高度; row++ ) {
                 for ( int col = 0; col < 地图宽度; col++ ) {
@@ -1283,7 +1293,7 @@ namespace TMX地图工具 {
         }
 
         bool IsBlackInMask( int x, int y ) {
-            return 遮罩[x, y] == black +  随机地图标记起始索引;
+            return 遮罩[x, y] == black + 随机地图标记起始索引;
         }
 
         bool IsBlackInMask( Point pos ) {
@@ -1343,11 +1353,11 @@ namespace TMX地图工具 {
         }
 
         public bool 当前坐标N格范围包含特定地型( Point pos, int n, 该位置匹配的地型特征 该位置有某地型 ) {
-            return 当前坐标N格范围包含特定地型( pos.X, pos.Y, n, 该位置有某地型);
+            return 当前坐标N格范围包含特定地型(pos.X, pos.Y, n, 该位置有某地型);
         }
 
         public bool 当前坐标N格范围内没有特定地型( Point pos, int n, 该位置匹配的地型特征 该位置有某地型 ) {
-            return 当前坐标N格范围内没有特定地型( pos.X, pos.Y, n, 该位置有某地型);
+            return 当前坐标N格范围内没有特定地型(pos.X, pos.Y, n, 该位置有某地型);
         }
 
         public bool 当前坐标N格范围内没有特定地型( int x, int y, int n, 该位置匹配的地型特征 该位置有某地型 ) {
@@ -1451,7 +1461,7 @@ namespace TMX地图工具 {
         private void btn_level_Click( object sender, EventArgs e ) {
 
             string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_Landlevel", "tmx");
-            if( savePath == null ) {
+            if ( savePath == null ) {
                 return;
             }
 
@@ -1565,14 +1575,14 @@ namespace TMX地图工具 {
             if ( !tilesets.Contains(tsxName) ) {
 
                 MessageBox.Show(string.Format("地图文件不包含'{0}'图集,请先添加图集!", tsxName));
-                return ;
+                return;
             }
             int 大地图资源起始索引 = tilesets[tsxName].FirstGid;
             int 资源类型图块在图集中起始索引 = 0;
 
             float[,] 土地资源概率生成表 = null;
             IWorkbook wk = GetIWorkbook(textBox1.Text);
-            if (!GetXlsxTable(wk, textBox2.Text, ref 土地资源概率生成表) ) {
+            if ( !GetXlsxTable(wk, textBox2.Text, ref 土地资源概率生成表) ) {
                 return;
             }
 
@@ -1585,7 +1595,7 @@ namespace TMX地图工具 {
             if ( !SetGidOfLayer("Layer2", ref 资源类型) ) {
                 return;
             }
-            
+
             //随机资源种类
             int 土地等级gid的起始编号 = 大地图标记起始索引 + 土地等级图块在图集中起始索引;
             int 资源种类gid的起始编号 = 大地图资源起始索引 + 资源类型图块在图集中起始索引;
@@ -1598,9 +1608,9 @@ namespace TMX地图工具 {
             for ( int y = 0; y < 地图高度; y++ ) {
                 for ( int x = 0; x < 地图宽度; x++ ) {
 
-                    bool beanloop = true ;
+                    bool beanloop = true;
 
-                    if( 该位置为山体(x, y) ) {
+                    if ( 该位置为山体(x, y) ) {
                         continue;
                     }
 
@@ -1620,7 +1630,7 @@ namespace TMX地图工具 {
                                 break;
                             }
                         }
-                        if( beanloop ) MessageBox.Show(string.Format("{0}-{1}:必须生成空地资源{2}:没生成空地资源!sum={3},random={4}", x, y, 0, sum, random));
+                        if ( beanloop ) MessageBox.Show(string.Format("{0}-{1}:必须生成空地资源{2}:没生成空地资源!sum={3},random={4}", x, y, 0, sum, random));
                     }
                     else {
 
@@ -1646,7 +1656,7 @@ namespace TMX地图工具 {
                                         break;
                                     }
                                 }
-                                if ( beanloop ) MessageBox.Show(string.Format("{0}-{1}:该位置土地等级{2}:没生成资源!sum={3},random={4}", x, y, 土地等级+1, sum, random));
+                                if ( beanloop ) MessageBox.Show(string.Format("{0}-{1}:该位置土地等级{2}:没生成资源!sum={3},random={4}", x, y, 土地等级 + 1, sum, random));
                             }
                             else {
                                 random = Range(1, 100);
@@ -1660,11 +1670,11 @@ namespace TMX地图工具 {
                                         break;
                                     }
                                 }
-                                if ( beanloop ) MessageBox.Show(string.Format("{0}-{1}:该位置土地等级{2}:没生成空地资源!sum={3},random={4}", x, y, 土地等级+1, sum, random));
+                                if ( beanloop ) MessageBox.Show(string.Format("{0}-{1}:该位置土地等级{2}:没生成空地资源!sum={3},random={4}", x, y, 土地等级 + 1, sum, random));
                             }
                         }
                     }
-                    
+
                 }
             }
 
@@ -1690,7 +1700,7 @@ namespace TMX地图工具 {
                     }
                 }
             }
-            
+
             //保存修改
             List<int[,]> 待转化数组列表 = new List<int[,]> { 资源类型, };
             List<string> 图层名字列表 = new List<string>() { "Layer2", };
@@ -1702,7 +1712,7 @@ namespace TMX地图工具 {
             SaveTmx(savePath);
         }
 
-        bool 必须生成空地地块(int x, int y ) {
+        bool 必须生成空地地块( int x, int y ) {
 
             if (
                 该位置为湖泊(x, y) ||
@@ -1724,19 +1734,19 @@ namespace TMX地图工具 {
             string savePath = OpenSaveFileDialog("Tiled地图(*.tmx)|*.tmx|所有文件|*.*", "WorldMap_Test", "tmx");
             if ( savePath == null ) {
                 return;
-            }         
+            }
 
             if ( !TmxIsLoaded() ) {
                 return;
             }
 
             Stopwatch sw = new Stopwatch();
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
 
             #region 新规则
             List<List<Point>> 每个郡区域点列表 = new List<List<Point>>();
             GetPointListForEachArea(ref 每个郡区域点列表, "Area1");
-            
+
             #endregion
 
 
@@ -1754,7 +1764,7 @@ namespace TMX地图工具 {
             Log(string.Format("收集城市点... 耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
             Log(string.Format("城市个数:{0}!", cityList.Count));
             //根据城市个数初始化数据
             Dictionary<Point, List<Point>> city_areaList = new Dictionary<Point, List<Point>>();//每个城市所有的区域点
@@ -1770,7 +1780,7 @@ namespace TMX地图工具 {
             sw.Stop();
             Log(string.Format("根据城市个数初始化数据...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
             //坐标归属最近的城市
 
             foreach ( var 郡区域点列表 in 每个郡区域点列表 ) {
@@ -1832,7 +1842,7 @@ namespace TMX地图工具 {
             sw.Stop();
             Log(string.Format("寻找修复分离的区域...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
             //记录城市相邻的城市  
             for ( int y = 0; y < 地图高度; y++ ) {
                 for ( int x = 0; x < 地图宽度; x++ ) {
@@ -1861,7 +1871,7 @@ namespace TMX地图工具 {
             sw.Stop();
             Log(string.Format("记录城市相邻的城市...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
             //城市区上色
             List<int> four_color = new List<int>() { brown, green, blue, purple, white, red, yellow };
             Dictionary<Point, int> city_color = new Dictionary<Point, int>();//每个城市使用区域颜色;
@@ -1875,12 +1885,12 @@ namespace TMX地图工具 {
 
                 //去掉周围城市已经用掉的颜色
                 foreach ( var neighborCityPos in city_neighborCityList[cityPos] ) {
-                    if( city_color.ContainsKey(neighborCityPos) ) {
+                    if ( city_color.ContainsKey(neighborCityPos) ) {
                         城市可用颜色.Remove(city_color[neighborCityPos]);
                     }
                 }
 
-                if( 城市可用颜色.Count > 0 ) {
+                if ( 城市可用颜色.Count > 0 ) {
                     city_color[cityPos] = 城市可用颜色[0];
                 }
                 else {
@@ -1897,7 +1907,7 @@ namespace TMX地图工具 {
             sw.Stop();
             Log(string.Format("城市区上色...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
 
             int[,] Area = new int[地图宽度, 地图高度];
 
@@ -1915,14 +1925,14 @@ namespace TMX地图工具 {
             List<int[,]> 待转化数组列表 = new List<int[,]> { Area, };
             List<string> 图层名字列表 = new List<string>() { "Area", };
 
-            if( !SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
+            if ( !SaveDataForEachLayer(待转化数组列表, 图层名字列表) ) {
                 return;
             }
 
             sw.Stop();
             Log(string.Format("tmx转化...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
 
-            sw.Reset();sw.Start();
+            sw.Reset(); sw.Start();
             SaveTmx(savePath);
             sw.Stop();
             Log(string.Format("保存...耗时:{0}毫秒!", sw.ElapsedMilliseconds));
@@ -1937,7 +1947,7 @@ namespace TMX地图工具 {
         /// <param name="pos"></param>
         /// <param name="n"></param>
         /// <returns></returns>
-        bool HaveCityInDistaneN( Point[,] point_city, Point pos, int n) {
+        bool HaveCityInDistaneN( Point[,] point_city, Point pos, int n ) {
             int x = pos.X;
             int y = pos.Y;
             for ( int row = y - n; row <= y + n; row++ ) {
@@ -1953,13 +1963,13 @@ namespace TMX地图工具 {
 
         //坐标是否是在城市边界且一格范围内没有城市本身
         bool IsAtBorderAndNotCitySelf( Point[,] point_city, Point pos ) {
-            if( HaveCityInDistaneN(point_city, pos, 1) ) {
+            if ( HaveCityInDistaneN(point_city, pos, 1) ) {
                 return false;
             }
 
             foreach ( var offset in 相邻八边偏移量 ) {
                 var currentPos = pos + offset;
-                if( IsInMap(currentPos) && point_city[pos.X, pos.Y] != point_city[currentPos.X, currentPos.Y] ) {
+                if ( IsInMap(currentPos) && point_city[pos.X, pos.Y] != point_city[currentPos.X, currentPos.Y] ) {
                     return true;
                 }
             }
@@ -1975,7 +1985,7 @@ namespace TMX地图工具 {
                 for ( int col = x - n; col <= x + n; col++ ) {
 
                     Point currentPos = new Point(col, row);
-                    if( IsInMap(currentPos) && !cityList.Contains(point_city[currentPos.X, currentPos.Y]) ) {
+                    if ( IsInMap(currentPos) && !cityList.Contains(point_city[currentPos.X, currentPos.Y]) ) {
                         cityList.Add(point_city[currentPos.X, currentPos.Y]);
                     }
                 }
@@ -2046,7 +2056,7 @@ namespace TMX地图工具 {
                         foreach ( var offset in 相邻四边偏移量 ) {
                             var neighborPos = currentPos + offset;
 
-                            if( IsInMap(neighborPos) && point_city[neighborPos.X, neighborPos.Y] != currentCityPos ) {
+                            if ( IsInMap(neighborPos) && point_city[neighborPos.X, neighborPos.Y] != currentCityPos ) {
 
                                 findleap[col, row] = 1;
                                 var neighborCityPos = point_city[neighborPos.X, neighborPos.Y];
@@ -2126,7 +2136,7 @@ namespace TMX地图工具 {
 
                 Point 郡首府位置;
 
-                if( (城市102点列表.Count + 城市103点列表.Count) >= 2 ) {
+                if ( ( 城市102点列表.Count + 城市103点列表.Count ) >= 2 ) {
 
                     if ( 城市102点列表.Count >= 2 ) {
                         MessageBox.Show(string.Format("坐标{0},{1}多个102郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市102点列表[1]));
@@ -2143,7 +2153,7 @@ namespace TMX地图工具 {
 
                     郡首府位置 = 城市102点列表[0];
                 }
-                else if( 城市103点列表.Count == 1 ) {
+                else if ( 城市103点列表.Count == 1 ) {
 
                     郡首府位置 = 城市103点列表[0];
                 }
@@ -2242,7 +2252,7 @@ namespace TMX地图工具 {
             //设置excel表格
             IWorkbook workbook = new XSSFWorkbook();
             ISheet sheet1 = workbook.CreateSheet("城市区域");
-            
+
             for ( int i = 0; i < cityList.Count; i++ ) {
                 //row.CreateCell(i).SetCellValue(cityList[i].ToString());
                 sheet1.SetColumnWidth(i, 256 * 12);
@@ -2250,7 +2260,7 @@ namespace TMX地图工具 {
 
 
             //设置列标题
-            List<string> titleList = new List<string> {"坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字","name" };
+            List<string> titleList = new List<string> { "坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字", "name" };
             IRow headRow = sheet1.CreateRow(0);
             for ( int col = 0; col < titleList.Count; col++ ) {
                 headRow.CreateCell(col).SetCellValue(titleList[col]);
@@ -2280,7 +2290,7 @@ namespace TMX地图工具 {
 
                     var name = "";
                     foreach ( var layer in 世界地图_TMX.Layers ) {
-                        
+
                         var temp = GetPropertyByPos(layer.Name, "Name", x, y);
                         if ( temp != string.Empty ) {
 
@@ -2323,12 +2333,40 @@ namespace TMX地图工具 {
             }
 
             //记录城市连通状态
-            道路遍历状态 = new int[地图宽度, 地图高度];
-            城市坐标_相连城市坐标.Clear();
+            显性道路遍历状态 = new int[地图宽度, 地图高度];
+            隐性道路遍历状态 = new int[地图宽度, 地图高度];
+            城市位置标记 = new int[地图宽度, 地图高度];
+            显性城市坐标_相连城市坐标.Clear();
+            隐形城市坐标_相连城市坐标.Clear();
+
+            List<Point> cityCenterList = new List<Point>();
             foreach ( var pos in cityList ) {
 
-                遍历相邻城市(pos);
+
+                var cityCenterPos = pos;
+                var matrix = GetPropertyByPos("Layer3", "matrix", pos.X, pos.Y);
+                if ( matrix != string.Empty ) {
+                    var w_h = matrix.Split('-');
+                    int width;
+                    int height;
+                    if ( w_h.Length == 2 && int.TryParse(w_h[0], out width) && int.TryParse(w_h[1], out height) ) {
+
+                        cityCenterPos.X += (int)( width / 2f );
+                        cityCenterPos.Y -= (int)( height / 2f );
+                    }
+                }
+                城市位置标记[cityCenterPos.X, cityCenterPos.Y] = 1;
+                cityCenterList.Add(cityCenterPos);
+                显性城市坐标_相连城市坐标[cityCenterPos] = new List<Point>();
+                隐形城市坐标_相连城市坐标[cityCenterPos] = new List<Point>();
             }
+
+            foreach ( var pos in cityCenterList ) {
+
+                四边方向道路遍历相连城市(pos, pos, "9");
+                四边方向道路遍历相连城市(pos, pos, "10");
+            }
+
 
             //设置excel表格
             IWorkbook workbook = new XSSFWorkbook();
@@ -2350,12 +2388,28 @@ namespace TMX地图工具 {
             int count = 1;
             progressBar1.Minimum = 0;
             progressBar1.Maximum = cityList.Count;
+            List<string> 显性相连 = new List<string>();
+            List<string> 隐性相连 = new List<string>();
 
-            foreach ( var pos in cityList ) {
-
+            foreach ( var pos in cityCenterList ) {
+                
                 IRow row = sheet1.CreateRow(count);
 
-                row.CreateCell(0).SetCellValue(string.Format("{0}_{1}", pos.X, pos.Y));
+                row.CreateCell(0).SetCellValue(PosStr(pos));
+
+                显性相连.Clear();
+                foreach ( var neighPos in 显性城市坐标_相连城市坐标[pos] ) {
+
+                    显性相连.Add(PosStr(neighPos));
+                }
+                row.CreateCell(1).SetCellValue( PosList(string.Join(",", 显性相连.ToArray())) );
+
+                隐性相连.Clear();
+                foreach ( var neighPos in 隐形城市坐标_相连城市坐标[pos] ) {
+
+                    隐性相连.Add(PosStr(neighPos));
+                }
+                row.CreateCell(2).SetCellValue(PosList(string.Join(",", 隐性相连.ToArray())));
 
                 progressBar1.Value = count;
                 count++;
@@ -2370,14 +2424,67 @@ namespace TMX地图工具 {
             MessageBox.Show("导出完成!");
         }
 
-        int[,] 道路遍历状态;
-        Dictionary<Point, List<Point>> 城市坐标_相连城市坐标 = new Dictionary<Point, List<Point>>();
-        void 遍历相邻城市(Point cityPos) {
-            var matrix = GetPropertyByPos("Layer3", "matrix", cityPos.X, cityPos.Y);
-            if ( matrix != string.Empty ) {
+        string PosStr(Point pos) {
+            return string.Format("{0}_{1}", pos.X, pos.Y);
+        }
 
+        string PosList( string value ) {
+            return string.Format("[{0}]", value);
+        }
+
+        int[,] 显性道路遍历状态;
+        int[,] 隐性道路遍历状态;
+        int[,] 城市位置标记;
+        Dictionary<Point, List<Point>> 显性城市坐标_相连城市坐标 = new Dictionary<Point, List<Point>>();
+        Dictionary<Point, List<Point>> 隐形城市坐标_相连城市坐标 = new Dictionary<Point, List<Point>>();
+        List<Directions> 城市相邻方位 = new List<Directions>() { Directions.NW, Directions.NE, Directions.SW, Directions.SE, };
+
+        void 四边方向道路遍历相连城市(Point fromCity, Point neighborPos, string terrainType) {
+
+            if( !IsInMap(neighborPos) ) {
+                return;
             }
-            List<Point> 城市相邻坐标 = new List<Point>();
+            
+            if ( 城市位置标记[neighborPos.X, neighborPos.Y] == 1 && fromCity != neighborPos ) {
+
+                if ( terrainType == "9" && !显性城市坐标_相连城市坐标[fromCity].Contains(neighborPos) ) {
+
+                    显性城市坐标_相连城市坐标[fromCity].Add(neighborPos);
+                    显性城市坐标_相连城市坐标[neighborPos].Add(fromCity);
+                }
+                if ( terrainType == "10" && !隐形城市坐标_相连城市坐标[fromCity].Contains(neighborPos) ) {
+
+                    隐形城市坐标_相连城市坐标[fromCity].Add(neighborPos);
+                    隐形城市坐标_相连城市坐标[neighborPos].Add(fromCity);
+                }
+
+                return;
+            }
+
+            if ( terrainType == "9" ) {
+
+                if ( 显性道路遍历状态[neighborPos.X, neighborPos.Y] == 1 ) return;
+                显性道路遍历状态[neighborPos.X, neighborPos.Y] = 1;
+            }
+
+            if ( terrainType == "10" ) {
+
+                if ( 隐性道路遍历状态[neighborPos.X, neighborPos.Y] == 1 ) return;
+                隐性道路遍历状态[neighborPos.X, neighborPos.Y] = 1;
+            }
+
+            var RoadType = GetPropertyByPos("Road", "RoadType", neighborPos.X, neighborPos.Y);
+            var TerrainType = GetPropertyByPos("Road", "TerrainType", neighborPos.X, neighborPos.Y);
+            if ( RoadType != string.Empty && TerrainType == terrainType ) {
+
+                for ( int i = 0; i < RoadType.Length; i++ ) {
+                    if ( RoadType[i] == '1' ) {
+
+                        var neighborPos2 = neighborPos + 相邻八边偏移量[(int)城市相邻方位[i]];
+                        四边方向道路遍历相连城市(fromCity, neighborPos2, terrainType);
+                    }
+                }
+            }
 
         }
         #endregion
@@ -2434,7 +2541,7 @@ namespace TMX地图工具 {
         public static DataTable ImportExcel( IWorkbook wk, string sheetName ) {
 
             DataTable dt = new DataTable();
-            
+
             //获取第一个sheet
             ISheet sheet = wk.GetSheet(sheetName);
             Log(sheet.SheetName);
@@ -2553,7 +2660,7 @@ namespace TMX地图工具 {
             }
             return result;
         }
-        
+
         bool GetXlsxTable( IWorkbook wk, string sheetName, ref float[,] array ) {
 
             if ( wk == null ) {
@@ -2576,7 +2683,7 @@ namespace TMX地图工具 {
             string str = GetCellValue(sheet2.GetRow(2).GetCell(11));
 
             float prob = 0;
-            if( float.TryParse(str, out prob) ) {
+            if ( float.TryParse(str, out prob) ) {
                 Log("资源占比:" + prob * 100 + "%");
                 return prob * 100;
             }
