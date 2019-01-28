@@ -1428,7 +1428,7 @@ namespace TMX地图工具 {
         bool 该位置为湖泊( int x, int y ) {
 
             var TerrainType = GetPropertyByPos("Layer1", "TerrainType", x, y);
-            if ( TerrainType == "3" ) return true;
+            if ( TerrainType == "8" ) return true;
             return false;
         }
 
@@ -2052,6 +2052,7 @@ namespace TMX地图工具 {
                         //Log(string.Format("{0}-{1}缺失", col, row));
 
                         var currentCityPos = point_city[col, row];
+                        
                         Point currentPos = new Point(col, row);
                         foreach ( var offset in 相邻四边偏移量 ) {
                             var neighborPos = currentPos + offset;
@@ -2061,6 +2062,9 @@ namespace TMX地图工具 {
                                 findleap[col, row] = 1;
                                 var neighborCityPos = point_city[neighborPos.X, neighborPos.Y];
 
+                                if ( !city_areaList.ContainsKey(currentCityPos) ) {
+                                    throw new Exception(string.Format("郡区域坐标{0}异常!!!!!!!!!!!!!", currentPos));
+                                }
                                 city_areaList[currentCityPos].Remove(currentPos);
                                 city_areaList[neighborCityPos].Add(currentPos);
                                 point_city[col, row] = neighborCityPos;
@@ -2452,7 +2456,7 @@ namespace TMX地图工具 {
                     显性城市坐标_相连城市坐标[fromCity].Add(neighborPos);
                     显性城市坐标_相连城市坐标[neighborPos].Add(fromCity);
                 }
-                if ( terrainType == "10" && !隐形城市坐标_相连城市坐标[fromCity].Contains(neighborPos) ) {
+                if ( terrainType == "11" && !隐形城市坐标_相连城市坐标[fromCity].Contains(neighborPos) ) {
 
                     隐形城市坐标_相连城市坐标[fromCity].Add(neighborPos);
                     隐形城市坐标_相连城市坐标[neighborPos].Add(fromCity);
@@ -2467,7 +2471,7 @@ namespace TMX地图工具 {
                 显性道路遍历状态[neighborPos.X, neighborPos.Y] = 1;
             }
 
-            if ( terrainType == "10" ) {
+            if ( terrainType == "11" ) {
 
                 if ( 隐性道路遍历状态[neighborPos.X, neighborPos.Y] == 1 ) return;
                 隐性道路遍历状态[neighborPos.X, neighborPos.Y] = 1;
