@@ -2132,6 +2132,10 @@ namespace TMX地图工具 {
             Point[,] point_郡首府 = new Point[地图宽度, 地图高度];
             foreach ( var 郡区域点列表 in 每个郡区域点列表 ) {
 
+
+                List<Point> 城市100点列表 = new List<Point>();
+                GetCityPosListInAreaByPropertyValue(郡区域点列表, Area_1_2_ID.Text, ref 城市100点列表);
+
                 List<Point> 城市102点列表 = new List<Point>();
                 GetCityPosListInAreaByPropertyValue(郡区域点列表, Area1_ID.Text, ref 城市102点列表);
 
@@ -2140,18 +2144,29 @@ namespace TMX地图工具 {
 
                 Point 郡首府位置;
 
-                if ( ( 城市102点列表.Count + 城市103点列表.Count ) >= 2 ) {
+                if ( ( 城市102点列表.Count + 城市103点列表.Count + 城市100点列表.Count ) >= 2 ) {
 
                     if ( 城市102点列表.Count >= 2 ) {
                         MessageBox.Show(string.Format("坐标{0},{1}多个102郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市102点列表[1]));
+                    }
+                    else if ( 城市100点列表.Count >= 2 ) {
+                        MessageBox.Show(string.Format("坐标{0},{1}多个100郡首府异常!!!!!!!!!!!!!", 城市100点列表[0], 城市100点列表[1]));
                     }
                     else if ( 城市103点列表.Count >= 2 ) {
                         MessageBox.Show(string.Format("坐标{0},{1}多个103郡首府异常!!!!!!!!!!!!!", 城市103点列表[0], 城市103点列表[1]));
                     }
                     else {
-                        MessageBox.Show(string.Format("坐标{0},{1}多个102和103郡首府异常!!!!!!!!!!!!!", 城市102点列表[0], 城市103点列表[0]));
+                        var pos1 = 城市100点列表.Count > 0 ? 城市100点列表[0] : Point.Empty;
+                        var pos2 = 城市102点列表.Count > 0 ? 城市102点列表[0] : Point.Empty;
+                        var pos3 = 城市103点列表.Count > 0 ? 城市103点列表[0] : Point.Empty;
+
+                        MessageBox.Show(string.Format("坐标{0},{1},{2}多个100和102以及103郡首府异常!!!!!!!!!!!!!", pos1, pos2, pos3));
                     }
                     return;
+                }
+                else if ( 城市100点列表.Count == 1 ) {
+
+                    郡首府位置 = 城市100点列表[0];
                 }
                 else if ( 城市102点列表.Count == 1 ) {
 
@@ -2162,7 +2177,7 @@ namespace TMX地图工具 {
                     郡首府位置 = 城市103点列表[0];
                 }
                 else {
-                    MessageBox.Show(string.Format("坐标{0}区域没有102和103郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
+                    MessageBox.Show(string.Format("坐标{0}区域没有102和103以及100郡首府异常!!!!!!!!!!!!!", 郡区域点列表[0]));
                     return;
                 }
 
@@ -2279,6 +2294,11 @@ namespace TMX地图工具 {
 
                     IRow row = sheet1.CreateRow(count);
                     var 县首府位置 = point_县首府位置[x, y];
+                    if ( 县首府位置 == Point.Empty) {
+
+                        MessageBox.Show(string.Format("{0}_{1}县首府为空!", x, y));
+                        return;
+                    }
                     var 郡首府位置 = point_郡首府[x, y];
                     var 洲首府位置 = point_洲首府[x, y];
 

@@ -80,7 +80,7 @@
             this.tb_path.Name = "tb_path";
             this.tb_path.Size = new System.Drawing.Size(507, 21);
             this.tb_path.TabIndex = 1;
-            this.tb_path.Text = "G:\\ZLF\\Unity_Projects\\SanGuo\\MapEditor\\Map\\WorldMap111.tmx";
+            this.tb_path.Text = "G:\\ZLF\\Unity_Projects\\SanGuo\\MapEditor\\Map\\WorldMap.tmx";
             // 
             // btn_brow
             // 
