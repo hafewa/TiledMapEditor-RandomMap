@@ -1619,6 +1619,8 @@ namespace TMX地图工具 {
                     }
 
                     if ( 必须生成空地地块(x, y) ) {
+                        资源类型[x, y] = 0;
+                        continue;
                         random = Range(1, 100);
                         sum = 0;
                         for ( int 资源索引 = 空地起始索引; 资源索引 < 资源种类; 资源索引++ ) {
@@ -2264,7 +2266,8 @@ namespace TMX地图工具 {
                 for ( int x = 0; x < 地图宽度; x++ ) {
 
                     土地等级[x, y] = GetPropertyByPos("LandLevel", "level", x, y);
-                    资源名字[x, y] = GetPropertyByPos("Layer2", "Name", x, y);
+                    string nameValue = GetPropertyByPos("Layer2", "Name", x, y);
+                    资源名字[x, y] = ( nameValue == string.Empty ? "0" : nameValue );
                 }
             }
 
@@ -2279,7 +2282,7 @@ namespace TMX地图工具 {
 
 
             //设置列标题
-            List<string> titleList = new List<string> { "坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字", "name" };
+            List<string> titleList = new List<string> { "坐标", "县首府", "县的ID", "郡首府", "洲首府", "土地等级", "资源名字", "NameOfTopLayer" };
             IRow headRow = sheet1.CreateRow(0);
             for ( int col = 0; col < titleList.Count; col++ ) {
                 headRow.CreateCell(col).SetCellValue(titleList[col]);
